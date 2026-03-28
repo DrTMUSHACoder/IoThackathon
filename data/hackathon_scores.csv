@@ -1,0 +1,46 @@
+S.No,ProjectTitle,TeamName,Email,Round1,Round2,Round3P1,Round3P2,Round4,Total
+01,IoT Based Automated Fire Fighting Robot using Arduino and Flame Sensors,Team 01,placeholder@example.com,0,0,0,0,0,0
+02,Autonomous Human Following Robot System using Arduino and IR Logic,Team 02,placeholder@example.com,0,0,0,0,0,0
+03,Smartphone Bluetooth Controlled Robot System for Remote Exploration using Arduino,Team 03,placeholder@example.com,0,0,0,0,0,0
+04,Autonomous Firefront Mapping and Wireless Safety Rover System using Arduino,Team 04,placeholder@example.com,0,0,0,0,0,0
+05,Smart Blind Spot Radar Integrated Cycle Handle Vibration Alert System using Arduino,Team 05,placeholder@example.com,0,0,0,0,0,0
+06,IoT Based Agriculture Monitoring and Soil Analysis System using Arduino,Team 06,placeholder@example.com,0,0,0,0,0,0
+07,IoT Based Automated Crop Irrigation Monitoring System using Arduino and Relay,Team 07,placeholder@example.com,0,0,0,0,0,0
+08,IoT Based Smart Remote Irrigation Monitoring and Control System using Arduino,Team 08,placeholder@example.com,0,0,0,0,0,0
+09,Smart Agriculture Soil Humidity and Nutrient Loop Control System using Arduino,Team 09,placeholder@example.com,0,0,0,0,0,0
+10,Automated Smart Plant Aquaponics Controlling System using Arduino,Team 10,placeholder@example.com,0,0,0,0,0,0
+11,Smart Agricultural Grain Warehouse Heat Map and Aeration System using Arduino,Team 11,placeholder@example.com,0,0,0,0,0,0
+12,Anti-Theft Security and Sidewalk Navigation Assistive System using Arduino,Team 12,placeholder@example.com,0,0,0,0,0,0
+13,IoT Based Industrial Safety Monitoring and Hazard Alerting System using NodeMCU Hub,Team 13,placeholder@example.com,0,0,0,0,0,0
+14,IoT Based Gas and Flame Detection Safety Alerting System using ESP32/WiFi Hub,Team 14,placeholder@example.com,0,0,0,0,0,0
+15,Synced Multi-Room Fire Evacuation and Emergency Sync Alarm System using Arduino,Team 15,placeholder@example.com,0,0,0,0,0,0
+16,Home Security Anti-Theft Floor Mat Intrusion Detection System using Arduino,Team 16,placeholder@example.com,0,0,0,0,0,0
+17,IV Line Air-Embolism Prevention and Flow Stopper Safety System using Arduino,Team 17,placeholder@example.com,0,0,0,0,0,0
+18,Automated Smart Home Bathroom Aerated Occupancy Sensing System using Arduino,Team 18,placeholder@example.com,0,0,0,0,0,0
+19,Automated Industrial Area Safety and Hazard Lockout System using Arduino,Team 19,placeholder@example.com,0,0,0,0,0,0
+20,IoT Based Smart Helmet Access and Safety Enforcement System using Arduino,Team 20,placeholder@example.com,0,0,0,0,0,0
+21,IoT Based Air Smoke and Alcohol Detection Alerting System (MQ2/MQ3 Proxies),Team 21,placeholder@example.com,0,0,0,0,0,0
+22,Automated Public Park Bushfire Detection and Alarm System using Arduino,Team 22,placeholder@example.com,0,0,0,0,0,0
+23,Autonomous Firefront Mapping and Safety Rover Navigation Hub using Arduino,Team 23,placeholder@example.com,0,0,0,0,0,0
+24,IoT Based Patient Health Monitoring and Vital Tracking System using NodeMCU Station,Team 24,placeholder@example.com,0,0,0,0,0,0
+25,Heart Disease Prediction using Wearable IoT Sensors and WiFi Link Hub,Team 25,placeholder@example.com,0,0,0,0,0,0
+26,EMIT (Emergency Medical Information Tracker): Alert System using Arduino,Team 26,placeholder@example.com,0,0,0,0,0,0
+27,Heart Disease Detection and Prediction via Wearable Proximity Sensors Hub,Team 27,placeholder@example.com,0,0,0,0,0,0
+28,SMART Shopping Card: RFID/Proximity Based Item Billing System using Arduino,Team 28,placeholder@example.com,0,0,0,0,0,0
+29,RFICS Toll Gate and Automated Vehicle Clearance System using Arduino,Team 29,placeholder@example.com,0,0,0,0,0,0
+30,Smart Parking Space Monitoring System using IR Sensors and WiFi Station,Team 30,placeholder@example.com,0,0,0,0,0,0
+31,Automatic Door Lock/Unlock System using IR Sensing and Servo Control Hub,Team 31,placeholder@example.com,0,0,0,0,0,0
+32,IoT Based Weather and Air Quality Monitoring System using DHT and WiFi Hub,Team 32,placeholder@example.com,0,0,0,0,0,0
+33,IoT Based Smart Air Quality Purifying and Fan Aeration System using Arduino,Team 33,placeholder@example.com,0,0,0,0,0,0
+34,IoT Based Room Temperature and Central Humidity Controlling System using Arduino,Team 34,placeholder@example.com,0,0,0,0,0,0
+35,IoT Based School Classroom Presence and Monitoring System using Arduino/WiFi Link,Team 35,placeholder@example.com,0,0,0,0,0,0
+36,Smart Corridor Energy Fan and Climate Controlling System using Arduino,Team 36,placeholder@example.com,0,0,0,0,0,0
+37,Bus Door Safe Zone Footboard Occupancy Monitoring System using Arduino,Team 37,placeholder@example.com,0,0,0,0,0,0
+38,Cycle Blind Spot Warning and Side-Facing Cycle Bell Safety System using Arduino,Team 38,placeholder@example.com,0,0,0,0,0,0
+39,Automated Wet and Dry Waste Auto-Segregation Bin System using Arduino,Team 39,placeholder@example.com,0,0,0,0,0,0
+40,Smart Refrigerator Energy Saving and Door-Open Warning System using Arduino,Team 40,placeholder@example.com,0,0,0,0,0,0
+41,Energy Real-time Monitoring and Power Cut-off System using Arduino Relay Station,Team 41,placeholder@example.com,0,0,0,0,0,0
+42,Public Transport Tracking and Arrival Notification System using WiFi Hub Hub,Team 42,placeholder@example.com,0,0,0,0,0,0
+43,Bus Student Count Tracking and Overcrowding Alert System using Arduino,Team 43,placeholder@example.com,0,0,0,0,0,0
+44,WiFi Integrated Neighborhood Urban Heat Island Monitoring System using Raspberry Pi,Team 44,placeholder@example.com,0,0,0,0,0,0
+45,WiFi Integrated Municipal Storage Tank Leakage Prediction System using Raspberry Pi,Team 45,placeholder@example.com,0,0,0,0,0,0

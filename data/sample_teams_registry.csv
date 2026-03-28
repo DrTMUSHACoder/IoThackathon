@@ -1,0 +1,6 @@
+TeamID,ProjectID,TeamName,ProjectTitle,LeaderEmail
+T-01,PID-101,Tech Titans,Smart Agriculture Monitoring,leader1@example.com
+T-02,PID-102,Innovators,Automated Irrigation System,leader2@example.com
+T-03,PID-103,IoT Builders,Smart Home Automation,leader3@example.com
+T-04,PID-104,Code Crafters,Industrial IoT Gateway,leader4@example.com
+T-05,PID-105,Robo Rangers,Autonomous Warehouse Robot,leader5@example.com
