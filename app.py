@@ -110,41 +110,44 @@ def initialize_db(registry_path=None):
     
     if registry_path and os.path.exists(registry_path):
         if registry_path.endswith('.csv'):
-            with open(registry_path, mode='r', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f)
-                rows = [ {k.strip(): v for k,v in row.items() if k} for row in reader ]
+            df = pd.read_csv(registry_path, sep=None, engine='python', encoding_errors='ignore')
         else:
             df = pd.read_excel(registry_path)
-            rows = df.to_dict(orient='records')
-            # Normalize keys to strip spaces from Excel headers too
-            rows = [ {str(k).strip(): v for k,v in row.items()} for row in rows ]
+        
+        # 🧹 AGGRESSIVE HEADER CLEANING
+        df.columns = [str(c).strip() for c in df.columns]
+        rows = df.to_dict(orient='records')
 
-        print(f"[DB] Attempting to import {len(rows)} potential teams...")
+        print(f"[DB] SCANNING REGISTRY: Found {len(rows)} rows. Headers detected: {list(df.columns)}")
+        
         for row in rows:
-            # 🕵️ SMART MAPPING (Extremely aggressive search)
+            # 🕵️ FUZZY MAPPING
             def find_val(keys):
                 for k in keys:
                     for rk in row.keys():
-                        if k.lower() == rk.lower().strip(): return row[rk]
+                        clean_rk = str(rk).lower().strip().replace("_", "").replace(" ", "")
+                        clean_k = str(k).lower().strip().replace("_", "").replace(" ", "")
+                        if clean_k == clean_rk: return row[rk]
                 return ""
 
-            email = str(find_val(['Mail Id', 'MailId', 'Email ID', 'Email', 'LeaderEmail', 'Mail_Id'])).strip()
+            email = str(find_val(['Email', 'MailId', 'EmailID', 'Mail Id', 'LeaderEmail'])).strip()
             
-            # Skip invalid/header rows
-            if not email or "@" not in email:
-                print(f"[DB] Skipping row - No valid email found: {row}")
+            # Skip invalid
+            if not email or "@" not in email or "placeholder" in email:
                 continue
 
             team_row = {
-                'TeamID': find_val(['S.No', 'SNo', 'TeamID', 'ID']),
-                'ProjectID': find_val(['Batch NO', 'BatchNO', 'ProjectID', 'PID']),
-                'TeamName': find_val(['Name of The Student', 'TeamName', 'StudentName', 'Name']),
-                'ProjectTitle': find_val(['Problem Statement', 'ProjectTitle', 'Title', 'Problem']),
+                'TeamID': find_val(['SNo', 'TeamID', 'ID', 'S.No']),
+                'ProjectID': find_val(['BatchNO', 'ProjectID', 'PID', 'Batch NO']),
+                'TeamName': find_val(['NameoftheStudent', 'TeamName', 'StudentName', 'Name', 'Name of The Student']),
+                'ProjectTitle': find_val(['ProblemStatement', 'ProjectTitle', 'Title', 'ProblemStatement', 'Problem Statement']),
                 'Email': email
             }
+            # Initialize scoring fields
             for field in HEADERS[5:]: team_row[field] = 0
             data.append(team_row)
-        print(f"[DB] Successfully imported {len(data)} valid teams into Evaluator Database.")
+            
+        print(f"[DB] SUCCESS: Logged {len(data)} valid teams into the system.")
     else:
         if os.path.exists(PROPOSAL_FILE):
             with open(PROPOSAL_FILE, mode='r', encoding='utf-8') as f:
@@ -270,7 +273,17 @@ def send_startup_emails():
     """Iterate through all registered teams and dispatch official hackathon credentials."""
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     
-    for t in get_teams():
+    current_teams = get_teams()
+    sent_count, skip_count = 0, 0
+    
+    for t in current_teams:
+        email = t.get('Email', '').strip()
+        
+        # 🛡️ Safety Filter (Shared logic with send_real_email)
+        if not email or "placeholder" in email or "@" not in email:
+            skip_count += 1
+            continue
+
         body = f"""Dear Student ({t.get('TeamName')}),
 
 Greetings from PRAKALP IoT Hackathon Team!
@@ -292,8 +305,12 @@ Wishing you all the best for your hackathon journey!
 
 Regards,
 PRAKALP IoT Admin Team"""
-        send_real_email(t.get('Email', ''), f"PRAKALP IoT Hackathon: Project Assignment ({t.get('ProjectID')})", body)
-    return redirect(url_for('admin') + '?emailed=1')
+        try:
+            send_real_email(email, f"PRAKALP IoT Hackathon: Project Assignment ({t.get('ProjectID')})", body)
+            sent_count += 1
+        except: skip_count += 1
+    
+    return redirect(url_for('admin') + f'?emailed=1&sent={sent_count}&skipped={skip_count}')
 
 @app.route('/announce_prize', methods=['POST'])
 def announce_prize():

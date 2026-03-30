@@ -420,6 +420,18 @@
 
         {% endfor %}
 
+          {% if request.args.get('emailed') %}
+            <div class="banner" style="background: #1b5e20; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #4caf50;">
+                🚀 <strong>Mass Dispatch Complete!</strong> 
+                <span style="margin-left:15px; background:rgba(0,0,0,0.2); border-radius:4px; padding:2px 8px;">
+                    Sent: {{ request.args.get('sent', '0') }}
+                </span>
+                <span style="margin-left:15px; color:#ffdddd;">
+                    Skipped: {{ request.args.get('skipped', '0') }}
+                </span>
+            </div>
+        {% endif %}
+
     </form>
 
     <!-- ═══ Save Toast ═══ -->
