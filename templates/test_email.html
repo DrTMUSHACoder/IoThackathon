@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Engine Diagnostics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script>
+        const currTheme = localStorage.getItem('theme') || 'neon-blue';
+        document.documentElement.setAttribute('data-theme', currTheme);
+    </script>
+</head>
+<body style="min-height: 100vh;">
+    {% include 'header.html' %}
+    
+    <div class="container animate-fade" style="max-width: 600px; margin: 60px auto; text-align: center;">
+        <div class="glass-card" style="padding: 40px;">
+            <h2 class="heading-font" style="margin-bottom: 15px;">🌐 SMTP Diagnostic Hub</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                Sending natively from:<br>
+                <strong style="color: var(--primary-neon);">{{ sender }}</strong>
+            </p>
+            
+            <form method="POST" style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <div style="width: 100%;">
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Target Inbox 1</label>
+                    <input type="text" name="target_email_1" value="{{ target_1 }}" class="criteria-input" style="width: 80%; padding: 12px; font-size: 1rem; text-align: center; margin-bottom: 15px;">
+                    
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Target Inbox 2 (Optional)</label>
+                    <input type="text" name="target_email_2" value="{{ target_2 }}" class="criteria-input" style="width: 80%; padding: 12px; font-size: 1rem; text-align: center; margin-bottom: 15px;">
+
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Target Inbox 3 (Optional)</label>
+                    <input type="text" name="target_email_3" value="{{ target_3 }}" class="criteria-input" style="width: 80%; padding: 12px; font-size: 1rem; text-align: center;">
+                </div>
+                
+                <button type="submit" class="btn-primary" style="padding: 14px 30px; font-size: 1.1rem; width: 80%; justify-content: center;">
+                    🚀 Fire Bulk Test Emails
+                </button>
+            </form>
+            
+            {% if result %}
+                <div style="margin-top: 30px; padding: 20px; border-radius: 12px; font-weight: 500; font-family: monospace; font-size: 1.1rem; border: 1px solid var(--glass-border);
+                    {% if '✅' in result %}
+                        background: color-mix(in srgb, #00C853 10%, transparent); color: #00E676; border-color: rgba(0,200,83,0.3);
+                    {% else %}
+                        background: color-mix(in srgb, #FF1744 10%, transparent); color: #FF5252; border-color: rgba(255,23,68,0.3);
+                    {% endif %}">
+                    {{ result }}
+                </div>
+            {% endif %}
+            
+            <div style="margin-top: 30px;">
+                <a href="/admin" class="btn-secondary" style="font-size: 0.85rem; padding: 8px 16px; text-decoration: none;">← Return to Admin Config</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
