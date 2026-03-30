@@ -62,15 +62,23 @@ def initialize_db(path=None):
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if path.endswith('.csv') else pd.read_excel(path)
             df.columns = [str(x).strip() for x in df.columns]
             for r in df.to_dict(orient='records'):
+                # ✨ ULTRA-FUZZY KEYWORD FINDER
                 def f(ks):
-                    for k in ks:
-                        for rk in r.keys():
-                            if k.lower().replace(" ","") == rk.lower().replace(" ",""): return r[rk]
+                    ks = [str(x).lower().strip() for x in ks]
+                    for rk in r.keys():
+                        rk_clean = str(rk).lower().strip()
+                        if any(k in rk_clean for k in ks): return r[rk]
                     return ""
-                e = str(f(['Email', 'MailId', 'LeaderEmail'])).strip()
-                if "@" in e:
-                    cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s);",
-                                (str(f(['SNo', 'TeamID', 'ID'])), str(f(['BatchNO', 'ProjectID', 'PID'])), str(f(['TeamName', 'Name', 'StudentName'])), str(f(['ProblemStatement', 'ProjectTitle', 'Title'])), e))
+                
+                email = str(f(['Email', 'Mail', 'Id'])).strip()
+                if "@" in email:
+                    tid = str(f(['No', 'TeamID', 'ID'])).strip() or "0"
+                    pid = str(f(['Batch', 'ProjectID', 'PID'])).strip() or "PR-IOT"
+                    name = str(f(['Name', 'Student', 'Team'])).strip() or "Anonymous Team"
+                    title = str(f(['Title', 'Problem', 'Statement'])).strip() or "Untitled Project"
+                    
+                    cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;",
+                                (tid, pid, name, title, email))
         c.commit()
     finally: c.close()
 
@@ -84,28 +92,19 @@ def get_teams():
         res = []
         for r in raw:
             t = dict(r)
-            # 🔄 REMAP Lowercase SQL to Case-Sensitive Template Keys
-            t['TeamID'] = t.get('teamid')
-            t['ProjectID'] = t.get('projectid')
-            t['TeamName'] = t.get('teamname')
-            t['ProjectTitle'] = t.get('projecttitle')
-            t['Email'] = t.get('email')
-            
+            # 🔄 REMAP for Dashboard Compatibility
+            t['TeamID'], t['ProjectID'], t['TeamName'], t['ProjectTitle'], t['Email'] = t['teamid'], t['projectid'], t['teamname'], t['projecttitle'], t['email']
             for k, v in t.items():
                 if k.startswith('r'): t[k] = float(v or 0)
             def s(fs): return sum(float(t.get(f, 0)) for f in fs)
-            t['R1_Total'] = s(SCORING_FIELDS['R1'])
-            t['R2_Total'] = s(SCORING_FIELDS['R2'])
-            t['R3P1_Total'] = s(SCORING_FIELDS['R3P1'])
-            t['R3P2_Total'] = s(SCORING_FIELDS['R3P2'])
-            t['R4_Total'] = s(SCORING_FIELDS['R4'])
+            t['R1_Total'], t['R2_Total'], t['R3P1_Total'], t['R3P2_Total'], t['R4_Total'] = s(SCORING_FIELDS['R1']), s(SCORING_FIELDS['R2']), s(SCORING_FIELDS['R3P1']), s(SCORING_FIELDS['R3P2']), s(SCORING_FIELDS['R4'])
             t['Weighted_Total'] = (t['R1_Total']*0.3) + (t['R2_Total']*0.3) + (t['R3P1_Total']*0.4) + (t['R3P2_Total']*0.4) + (t['R4_Total']*0.6)
             res.append(t)
         return sorted(res, key=lambda x: x['Weighted_Total'], reverse=True)
     except:
         initialize_db()
         return []
-    finally: c.close()
+    finally: if c: c.close()
 
 # ==============================
 # 📧 ENGINE & ROUTES
@@ -115,7 +114,7 @@ def send_email(to, sub, body):
         msg = EmailMessage()
         msg.set_content(body)
         msg['Subject'] = sub
-        msg['From'] = f"PRAKALP 2026 <{SENDER_EMAIL}>"
+        msg['From'] = f"PRAKALP 2026<{SENDER_EMAIL}>"
         msg['To'] = to.strip()
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
             s.login(SENDER_EMAIL, SENDER_PASSWORD)
@@ -141,21 +140,17 @@ def admin():
 @app.route('/update_scores', methods=['POST'])
 def update_scores():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    fd = request.form.to_dict()
-    c = get_db_connection()
+    fd, c = request.form.to_dict(), get_db_connection()
     if not c: return redirect(url_for('admin'))
     try:
         cur = c.cursor()
         for sno in set([k.split('_')[-1] for k in fd.keys() if '_' in k]):
             up, pa = [], []
-            for m, fs in SCORING_FIELDS.items():
+            for fs in SCORING_FIELDS.values():
                 for f in fs:
                     if f"{f}_{sno}" in fd:
-                        up.append(f"{f} = %s")
-                        pa.append(float(fd[f"{f}_{sno}"] or 0))
-            if up:
-                pa.append(sno)
-                cur.execute(f"UPDATE teams SET {', '.join(up)} WHERE teamid = %s", pa)
+                        up.append(f"{f} = %s"); pa.append(float(fd[f"{f}_{sno}"] or 0))
+            if up: pa.append(sno); cur.execute(f"UPDATE teams SET {', '.join(up)} WHERE teamid = %s", pa)
         c.commit()
     finally: c.close()
     return redirect(url_for('admin') + '?saved=1')
@@ -174,13 +169,13 @@ def upload_dispatch():
         def f(ks):
             for k in ks:
                 for rk in r.keys():
-                    if k.lower().replace(" ","") == rk.lower().replace(" ",""): return r[rk]
+                    if k.lower() in rk.lower(): return r[rk]
             return ""
-        e = str(f(['Email', 'MailId'])).strip()
+        e = str(f(['Email', 'Mail'])).strip()
         if "@" in e:
-            n = f(['TeamName', 'Name'])
-            pid = f(['ProjectID', 'BatchNO'])
-            send_email(e, f"Assignment: {pid}", f"Dear Student {n},\n\nProject ID: {pid}\n\nGood luck!")
+            n, pid, title = f(['Name', 'Student', 'Team']), f(['Project', 'Batch', 'PID']), f(['Title', 'Problem', 'Statement'])
+            body = f"Dear Student {n},\n\nProblem: {title}\nID: {pid}\n\nGood luck!"
+            send_email(e, f"Assignment: {pid}", body)
             sent += 1
     return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
 
@@ -190,6 +185,12 @@ def finalize_registry():
     p = os.path.join('/tmp', 'registry.csv')
     if os.path.exists(p): initialize_db(p)
     return redirect(url_for('admin') + '?registered=1&tab=setup')
+
+@app.route('/reset_db', methods=['POST'])
+def reset_db():
+    if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    initialize_db()
+    return redirect(url_for('admin') + '?reset=1&tab=setup')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
