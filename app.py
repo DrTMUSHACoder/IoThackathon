@@ -24,10 +24,10 @@ ADMIN_PASSWORD = 'password'
 
 # Database Connection (Vercel Postgres)
 def get_db_connection():
-    conn_url = os.environ.get('POSTGRES_URL')
+    conn_url = os.environ.get('POSTGRES_URL') or os.environ.get('STORAGE_URL')
     if not conn_url:
         # Fallback for local testing if needed
-        raise Exception("POSTGRES_URL environment variable is missing!")
+        raise Exception("Database Connection URL (POSTGRES_URL/STORAGE_URL) is missing!")
     return psycopg2.connect(conn_url, sslmode='require')
 
 # ==============================
