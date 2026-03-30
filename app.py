@@ -264,11 +264,33 @@ def test_email():
     result, t1, t2, t3 = None, "drtmusha@rcee.ac.in", "", ""
     if request.method == 'POST':
         targets = [t for t in [request.form.get('target_email_1'), request.form.get('target_email_2'), request.form.get('target_email_3')] if t]
-        if not targets: result = "[ERROR] No emails entered."
+        if not targets:
+            result = "[ERROR] PLEASE ENTER AT LEAST 1 EMAIL!"
         else:
+            body = """Dear Student,
+
+Greetings from PRAKALP IoT Hackathon Team!
+
+We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
+
+Hackathon Project ID: PR-IOT-1A-001
+Problem Statement: "Automated Smart Home Bathroom Aerated Occupancy Sensing System using Arduino"
+
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+
+Official WhatsApp Group:
+https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
+All participants must join the group for further updates and communication.
+
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your hackathon journey!
+
+Regards,
+PRAKALP IoT Admin Team"""
             try:
                 for target in targets:
-                    send_real_email(target, "PRAKALP Dashboard: SMTP Bulk Diagnostic", "Live test confirmed.")
+                    send_real_email(target, "PRAKALP IoT Hackathon: Project Assignment", body)
                 result = f"[SUCCESS] Delivered to {len(targets)} inboxes!"
             except Exception as e: result = f"[ERROR] {str(e)}"
     return render_template('test_email.html', sender=SENDER_EMAIL, target_1=t1, target_2=t2, target_3=t3, result=result)
