@@ -110,29 +110,41 @@ def initialize_db(registry_path=None):
     
     if registry_path and os.path.exists(registry_path):
         if registry_path.endswith('.csv'):
-            with open(registry_path, mode='r', encoding='utf-8') as f:
+            with open(registry_path, mode='r', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f)
-                rows = list(reader)
+                rows = [ {k.strip(): v for k,v in row.items() if k} for row in reader ]
         else:
             df = pd.read_excel(registry_path)
             rows = df.to_dict(orient='records')
+            # Normalize keys to strip spaces from Excel headers too
+            rows = [ {str(k).strip(): v for k,v in row.items()} for row in rows ]
 
+        print(f"[DB] Attempting to import {len(rows)} potential teams...")
         for row in rows:
-            # 🕵️ SMART MAPPING for PSList.xlsx and other common formats
-            email = str(row.get('Mail Id') or row.get('LeaderEmail') or row.get('Email') or "").strip()
+            # 🕵️ SMART MAPPING (Extremely aggressive search)
+            def find_val(keys):
+                for k in keys:
+                    for rk in row.keys():
+                        if k.lower() == rk.lower().strip(): return row[rk]
+                return ""
+
+            email = str(find_val(['Mail Id', 'MailId', 'Email ID', 'Email', 'LeaderEmail', 'Mail_Id'])).strip()
             
             # Skip invalid/header rows
-            if not email or "@" not in email: continue
+            if not email or "@" not in email:
+                print(f"[DB] Skipping row - No valid email found: {row}")
+                continue
 
             team_row = {
-                'TeamID': row.get('S.No') or row.get('TeamID') or "",
-                'ProjectID': row.get('Batch NO') or row.get('ProjectID') or "",
-                'TeamName': row.get('Name of The Student') or row.get('TeamName') or "",
-                'ProjectTitle': row.get('Problem Statement') or row.get('ProjectTitle') or "",
+                'TeamID': find_val(['S.No', 'SNo', 'TeamID', 'ID']),
+                'ProjectID': find_val(['Batch NO', 'BatchNO', 'ProjectID', 'PID']),
+                'TeamName': find_val(['Name of The Student', 'TeamName', 'StudentName', 'Name']),
+                'ProjectTitle': find_val(['Problem Statement', 'ProjectTitle', 'Title', 'Problem']),
                 'Email': email
             }
             for field in HEADERS[5:]: team_row[field] = 0
             data.append(team_row)
+        print(f"[DB] Successfully imported {len(data)} valid teams into Evaluator Database.")
     else:
         if os.path.exists(PROPOSAL_FILE):
             with open(PROPOSAL_FILE, mode='r', encoding='utf-8') as f:
