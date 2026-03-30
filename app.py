@@ -12,8 +12,8 @@ app.secret_key = 'prakalp-secure-iot-key-2026'
 # ==============================
 # 🔐 EMAIL CONFIG (UPDATE THIS)
 # ==============================
-SENDER_EMAIL = 'ushawin2020@gmail.com'
-SENDER_PASSWORD = 'pvpknwqgsuttuqlm' # 💡 Restore your working password here
+SENDER_EMAIL = 'hod-cse-iot@rcee.ac.in'
+SENDER_PASSWORD = 'bichovbjfzkqypmh'
 
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'password'
