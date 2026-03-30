@@ -104,7 +104,8 @@ def get_teams():
     except:
         initialize_db()
         return []
-    finally: if c: c.close()
+    finally:
+        if c: c.close()
 
 # ==============================
 # 📧 ENGINE & ROUTES
