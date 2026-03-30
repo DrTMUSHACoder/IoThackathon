@@ -285,7 +285,27 @@ def upload_dispatch():
         name = str(find_val(['TeamName', 'Name of The Student'])).strip() or 'Unknown'
         title = find_val(['ProjectTitle', 'Problem Statement'])
 
-        body = f"Dear Student ({name}),\n\nGreetings from PRAKALP Team!\n\nYour assigned Project ID is: {pid}\nProblem Statement: {title}\n\nOfficial WhatsApp: https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t"
+        body = f"""Dear Student ({name}),
+
+Greetings from PRAKALP IoT Hackathon Team!
+
+We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
+
+Hackathon Project ID: {pid}
+Problem Statement: "{title}"
+
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+
+Official WhatsApp Group:
+https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
+All participants must join the group for further updates and communication.
+
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your hackathon journey!
+
+Regards,
+PRAKALP IoT Admin Team"""
         
         try:
             send_real_email(email, f"PRAKALP Assignment: {pid}", body)
@@ -351,7 +371,7 @@ def send_startup_emails():
             skip_count += 1
             continue
 
-        body = f"""Dear Student {t.get('TeamName')},
+        body = f"""Dear Student ({t.get('TeamName')}),
 
 Greetings from PRAKALP IoT Hackathon Team!
 
