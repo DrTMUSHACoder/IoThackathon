@@ -175,8 +175,28 @@ def upload_dispatch():
         e = str(f(['Email', 'Mail'])).strip()
         if "@" in e:
             n, pid, title = f(['Name', 'Student', 'Team']), f(['Project', 'Batch', 'PID']), f(['Title', 'Problem', 'Statement'])
-            body = f"Dear Student {n},\n\nProblem: {title}\nID: {pid}\n\nGood luck!"
-            send_email(e, f"Assignment: {pid}", body)
+            body = f"""Dear Student {n},
+
+Greetings from PRAKALP IoT Hackathon Team!
+
+We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
+
+Hackathon Project ID: {pid}
+Problem Statement: "{title}"
+
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+
+Official WhatsApp Group:
+https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
+All participants must join the group for further updates and communication.
+
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your hackathon journey!
+
+Regards,
+PRAKALP IoT Admin Team"""
+            send_email(e, f"PRAKALP Assignment: {pid}", body)
             sent += 1
     return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
 
