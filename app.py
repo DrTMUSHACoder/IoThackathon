@@ -166,14 +166,15 @@ def upload_dispatch():
     df = pd.read_csv(p, sep=None, engine='python', encoding_errors='ignore')
     rows = df.to_dict(orient='records')
     sent = 0
+    sent_emails = set()
     for r in rows:
         def f(ks):
             for k in ks:
                 for rk in r.keys():
                     if k.lower() in rk.lower(): return r[rk]
             return ""
-        e = str(f(['Email', 'Mail'])).strip()
-        if "@" in e:
+        e = str(f(['Email', 'Mail'])).strip().lower()
+        if "@" in e and e not in sent_emails:
             n, pid, title = f(['Name', 'Student', 'Team']), f(['Project', 'Batch', 'PID']), f(['Title', 'Problem', 'Statement'])
             body = f"""Dear Student {n},
 
@@ -197,6 +198,7 @@ Wishing you all the best for your hackathon journey!
 Regards,
 PRAKALP IoT Admin Team"""
             send_email(e, f"PRAKALP Assignment: {pid}", body)
+            sent_emails.add(e)
             sent += 1
     return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
 
