@@ -254,7 +254,7 @@ def upload_dispatch():
     if not file: return redirect(url_for('admin') + '?error=no_file')
 
     ext = '.csv' if file.filename.endswith('.csv') else '.xlsx'
-    temp_path = os.path.join(BASE_DIR, 'data', f'latest_registry{ext}')
+    temp_path = os.path.join('/tmp', f'latest_registry{ext}')
     file.save(temp_path)
 
     # 1. Parse File using industrial scanner
@@ -315,8 +315,8 @@ def finalize_registry():
     """STEP 2: Initialize the dashboard after successful broadcast."""
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     
-    csv_path = os.path.join(BASE_DIR, 'data', 'latest_registry.csv')
-    xlsx_path = os.path.join(BASE_DIR, 'data', 'latest_registry.xlsx')
+    csv_path = os.path.join('/tmp', 'latest_registry.csv')
+    xlsx_path = os.path.join('/tmp', 'latest_registry.xlsx')
     
     target = csv_path if os.path.exists(csv_path) else xlsx_path
     if not os.path.exists(target): return redirect(url_for('admin') + '?error=no_registry_temp&tab=setup')
