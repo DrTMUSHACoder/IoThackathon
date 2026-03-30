@@ -207,11 +207,7 @@ def send_real_email(to_email, subject, body):
 # ==============================
 @app.route('/')
 def index():
-    try:
-        return render_template('index.html', teams=get_teams())
-    except Exception as e:
-        import traceback
-        return f"CRITICAL SYSTEM ERROR: {str(e)}\n\n{traceback.format_exc()}"
+    return render_template('index.html', teams=get_teams())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

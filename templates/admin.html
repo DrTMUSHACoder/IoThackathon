@@ -679,7 +679,7 @@
             const step1Form = document.querySelector('form[action="/upload_dispatch"]');
             if (step1Form) {
                 step1Form.addEventListener('submit', () => {
-                    document.getElementById('loadingText').textContent = 'Sending ' + '{{ teams|length }}' + ' emails, please wait...';
+                    document.getElementById('loadingText').textContent = 'Broadcasting Project Assignments, please wait...';
                     document.getElementById('loadingOverlay').classList.add('show');
                 });
             }
