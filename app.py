@@ -248,14 +248,14 @@ def upload_dispatch():
             body = f"Dear Student {name},\n\nYour problem statement: {title}\nProject ID: {pid}\n\nGood luck!"
             send_real_email(email, f"PRAKALP Assignment: {pid}", body)
             sent += 1
-    return redirect(url_for('admin') + f'?emailed=1&sent={sent}')
+    return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
 
 @app.route('/finalize_registry', methods=['POST'])
 def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     path = os.path.join('/tmp', 'registry.csv')
     if os.path.exists(path): initialize_db(path)
-    return redirect(url_for('admin') + '?registered=1')
+    return redirect(url_for('admin') + '?registered=1&tab=setup')
 
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
