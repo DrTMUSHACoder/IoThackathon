@@ -22,13 +22,15 @@ SENDER_PASSWORD = 'bichovbjfzkqypmh'
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'password'
 
-# Database Connection (Vercel Postgres)
+# Database Connection (Vercel Postgres / Neon)
 def get_db_connection():
     conn_url = os.environ.get('POSTGRES_URL') or os.environ.get('STORAGE_URL')
     if not conn_url:
-        # Fallback for local testing if needed
-        raise Exception("Database Connection URL (POSTGRES_URL/STORAGE_URL) is missing!")
-    return psycopg2.connect(conn_url, sslmode='require')
+        return None
+    try:
+        return psycopg2.connect(conn_url, sslmode='require')
+    except:
+        return None
 
 # ==============================
 # 📊 SCHEMA & METADATA
@@ -105,136 +107,87 @@ SCORING_META = {
 # ==============================
 def initialize_db(registry_path=None):
     conn = get_db_connection()
-    cur = conn.cursor()
+    if not conn: return
     
-    # 1. Create table if not exists with all scoring columns
-    create_table_query = """
-    CREATE TABLE IF NOT EXISTS teams (
-        TeamID TEXT PRIMARY KEY,
-        ProjectID TEXT,
-        TeamName TEXT,
-        ProjectTitle TEXT,
-        Email TEXT,
-        r1_innovation NUMERIC DEFAULT 0,
-        r1_problemrelevance NUMERIC DEFAULT 0,
-        r1_techfeasibility NUMERIC DEFAULT 0,
-        r1_claritypresentation NUMERIC DEFAULT 0,
-        r2_feasibilityvalidation NUMERIC DEFAULT 0,
-        r2_systemdesignlogic NUMERIC DEFAULT 0,
-        r2_demoquality NUMERIC DEFAULT 0,
-        r2_technicalunderstanding NUMERIC DEFAULT 0,
-        r3p1_initialimplementation NUMERIC DEFAULT 0,
-        r3p1_approachmethodology NUMERIC DEFAULT 0,
-        r3p1_progresslevel NUMERIC DEFAULT 0,
-        r3p1_teamcoordination NUMERIC DEFAULT 0,
-        r3p2_improvementphase1 NUMERIC DEFAULT 0,
-        r3p2_innovationmodification NUMERIC DEFAULT 0,
-        r3p2_problemsolvingapproach NUMERIC DEFAULT 0,
-        r3p2_stabilityfunctionality NUMERIC DEFAULT 0,
-        r4_innovation NUMERIC DEFAULT 0,
-        r4_workingprototype NUMERIC DEFAULT 0,
-        r4_realtimeimpact NUMERIC DEFAULT 0,
-        r4_presentationskills NUMERIC DEFAULT 0,
-        r4_qahandling NUMERIC DEFAULT 0
-    );
-    """
-    cur.execute(create_table_query)
-    
-    if registry_path:
-        # Clear existing data for fresh initialization
-        cur.execute("DELETE FROM teams;")
+    try:
+        cur = conn.cursor()
+        # 1. Create table with scoring columns
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS teams (
+            TeamID TEXT PRIMARY KEY, ProjectID TEXT, TeamName TEXT, ProjectTitle TEXT, Email TEXT,
+            r1_innovation NUMERIC DEFAULT 0, r1_problemrelevance NUMERIC DEFAULT 0, r1_techfeasibility NUMERIC DEFAULT 0, r1_claritypresentation NUMERIC DEFAULT 0,
+            r2_feasibilityvalidation NUMERIC DEFAULT 0, r2_systemdesignlogic NUMERIC DEFAULT 0, r2_demoquality NUMERIC DEFAULT 0, r2_technicalunderstanding NUMERIC DEFAULT 0,
+            r3p1_initialimplementation NUMERIC DEFAULT 0, r3p1_approachmethodology NUMERIC DEFAULT 0, r3p1_progresslevel NUMERIC DEFAULT 0, r3p1_teamcoordination NUMERIC DEFAULT 0,
+            r3p2_improvementphase1 NUMERIC DEFAULT 0, r3p2_innovationmodification NUMERIC DEFAULT 0, r3p2_problemsolvingapproach NUMERIC DEFAULT 0, r3p2_stabilityfunctionality NUMERIC DEFAULT 0,
+            r4_innovation NUMERIC DEFAULT 0, r4_workingprototype NUMERIC DEFAULT 0, r4_realtimeimpact NUMERIC DEFAULT 0, r4_presentationskills NUMERIC DEFAULT 0, r4_qahandling NUMERIC DEFAULT 0
+        );
+        """)
         
-        # Load registry
-        if registry_path.endswith('.csv'):
-            df = pd.read_csv(registry_path, sep=None, engine='python', encoding_errors='ignore')
-        else:
-            df = pd.read_excel(registry_path)
-            
-        df.columns = [str(c).strip() for c in df.columns]
-        rows = df.to_dict(orient='records')
-        
-        for row in rows:
-            def find_val(keys):
-                for k in keys:
-                    for rk in row.keys():
-                        if str(k).lower().strip().replace("_","").replace(" ","") == str(rk).lower().strip().replace("_","").replace(" ",""): return row[rk]
-                return ""
-
-            email = str(find_val(['Email', 'MailId', 'EmailID', 'Mail Id', 'LeaderEmail'])).strip()
-            if not email or "@" not in email or "placeholder" in email: continue
-
-            insert_query = """
-            INSERT INTO teams (TeamID, ProjectID, TeamName, ProjectTitle, Email)
-            VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (TeamID) DO NOTHING;
-            """
-            cur.execute(insert_query, (
-                str(find_val(['SNo', 'TeamID', 'ID', 'S.No'])),
-                str(find_val(['BatchNO', 'ProjectID', 'PID', 'Batch NO'])),
-                str(find_val(['NameoftheStudent', 'TeamName', 'StudentName', 'Name', 'Name of The Student'])),
-                str(find_val(['ProblemStatement', 'ProjectTitle', 'Title', 'ProblemStatement', 'Problem Statement'])),
-                email
-            ))
-            
-    conn.commit()
-    cur.close()
-    conn.close()
+        if registry_path:
+            cur.execute("DELETE FROM teams;")
+            df = pd.read_csv(registry_path, sep=None, engine='python', encoding_errors='ignore') if registry_path.endswith('.csv') else pd.read_excel(registry_path)
+            df.columns = [str(c).strip() for c in df.columns]
+            for row in df.to_dict(orient='records'):
+                def f(ks):
+                    for k in ks:
+                        for rk in row.keys():
+                            if str(k).lower().replace("_","").replace(" ","") == str(rk).lower().replace("_","").replace(" ",""): return row[rk]
+                    return ""
+                e = str(f(['Email', 'MailId', 'LeaderEmail'])).strip()
+                if "@" in e:
+                    cur.execute("INSERT INTO teams (TeamID, ProjectID, TeamName, ProjectTitle, Email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING;",
+                               (str(f(['SNo', 'TeamID'])), str(f(['BatchNO', 'ProjectID'])), str(f(['TeamName', 'Name'])), str(f(['ProblemStatement', 'ProjectTitle'])), e))
+        conn.commit()
+    finally:
+        if conn: conn.close()
 
 def get_teams():
     conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT * FROM teams;")
-    teams = cur.fetchall()
-    
-    results = []
-    for row in teams:
-        row = dict(row) # convert from RealDict to standard dict
-        # Force numeric conversion for template safety
-        for k, v in row.items():
-            if k.startswith('r'): row[k] = float(v or 0)
-            
-        def sum_round(fields): return sum(float(row.get(f, 0)) for f in fields)
-        row['R1_Total'] = sum_round(SCORING_FIELDS['R1'])
-        row['R2_Total'] = sum_round(SCORING_FIELDS['R2'])
-        row['R3P1_Total'] = sum_round(SCORING_FIELDS['R3P1'])
-        row['R3P2_Total'] = sum_round(SCORING_FIELDS['R3P2'])
-        row['R4_Total'] = sum_round(SCORING_FIELDS['R4'])
+    if not conn: return []
+    try:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SELECT * FROM teams;")
+        teams = cur.fetchall()
         
-        row['Weighted_Total'] = (row['R1_Total'] * 0.3) + (row['R2_Total'] * 0.3) + (row['R3P1_Total'] * 0.4) + (row['R3P2_Total'] * 0.4) + (row['R4_Total'] * 0.6)
-        row['Raw_Total'] = row['R1_Total'] + row['R2_Total'] + row['R3P1_Total'] + row['R3P2_Total'] + row['R4_Total']
-        results.append(row)
-        
-    cur.close()
-    conn.close()
-    return sorted(results, key=lambda x: float(x['Weighted_Total']), reverse=True)
+        results = []
+        for row in teams:
+            row = dict(row)
+            for k, v in row.items():
+                if k.startswith('r'): row[k] = float(v or 0)
+            def s(fs): return sum(float(row.get(f, 0)) for f in fs)
+            row['R1_Total'] = s(SCORING_FIELDS['R1'])
+            row['R2_Total'] = s(SCORING_FIELDS['R2'])
+            row['R3P1_Total'] = s(SCORING_FIELDS['R3P1'])
+            row['R3P2_Total'] = s(SCORING_FIELDS['R3P2'])
+            row['R4_Total'] = s(SCORING_FIELDS['R4'])
+            row['Weighted_Total'] = (row['R1_Total']*0.3) + (row['R2_Total']*0.3) + (row['R3P1_Total']*0.4) + (row['R3P2_Total']*0.4) + (row['R4_Total']*0.6)
+            results.append(row)
+        return sorted(results, key=lambda x: x['Weighted_Total'], reverse=True)
+    except Exception as e:
+        if 'does not exist' in str(e).lower():
+            initialize_db()
+        return []
+    finally:
+        if conn: conn.close()
 
 # ==============================
-# 📧 EMAIL ENGINE
+# 📧 ENGINE & ROUTES
 # ==============================
 def send_real_email(to_email, subject, body):
-    clean_addr = to_email.strip().replace(" ", "")
-    if not clean_addr or "placeholder@example.com" in clean_addr or "@" not in clean_addr: return
-
     try:
         msg = EmailMessage()
         msg.set_content(body)
         msg['Subject'] = subject
         msg['From'] = f"PRAKALP 2026 <{SENDER_EMAIL}>"
-        msg['To'] = clean_addr
+        msg['To'] = to_email.strip()
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
-    except Exception as e:
-        print(f"[ERROR] Email Failed to {clean_addr}: {e}")
+    except: pass
 
-# ==============================
-# 🌐 ROUTES
-# ==============================
 @app.route('/')
 def index():
-    try:
-        return render_template('index.html', teams=get_teams())
-    except: return render_template('index.html', teams=[])
+    return render_template('index.html', teams=get_teams())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -254,107 +207,61 @@ def update_scores():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     form_data = request.form.to_dict()
     conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Batch update implementation
-    for sno in set([k.split('_')[-1] for k in form_data.keys() if '_' in k]):
-        update_parts = []
-        params = []
-        for round_name, sub_fields in SCORING_FIELDS.items():
-            for field in sub_fields:
-                key = f"{field}_{sno}"
-                if key in form_data:
-                    update_parts.append(f"{field} = %s")
-                    params.append(float(form_data[key] or 0))
-        
-        if update_parts:
-            query = f"UPDATE teams SET {', '.join(update_parts)} WHERE TeamID = %s"
-            params.append(sno)
-            cur.execute(query, params)
-            
-    conn.commit()
-    cur.close()
-    conn.close()
+    if not conn: return redirect(url_for('admin'))
+    try:
+        cur = conn.cursor()
+        for sno in set([k.split('_')[-1] for k in form_data.keys() if '_' in k]):
+            up, pa = [], []
+            for m, fs in SCORING_FIELDS.items():
+                for f in fs:
+                    if f"f_{sno}" in form_data: # Placeholder
+                        pass
+                    if f"{f}_{sno}" in form_data:
+                        up.append(f"{f} = %s")
+                        pa.append(float(form_data[f"{f}_{sno}"] or 0))
+            if up:
+                pa.append(sno)
+                cur.execute(f"UPDATE teams SET {', '.join(up)} WHERE TeamID = %s", pa)
+        conn.commit()
+    finally: conn.close()
     return redirect(url_for('admin') + '?saved=1')
 
 @app.route('/upload_dispatch', methods=['POST'])
 def upload_dispatch():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     file = request.files.get('registry_file')
-    if not file: return redirect(url_for('admin') + '?error=no_file')
-
-    ext = '.csv' if file.filename.endswith('.csv') else '.xlsx'
-    temp_path = os.path.join('/tmp', f'latest_registry{ext}')
-    file.save(temp_path)
-
-    df = pd.read_csv(temp_path, sep=None, engine='python', encoding_errors='ignore') if ext == '.csv' else pd.read_excel(temp_path)
-    df.columns = [str(c).strip() for c in df.columns]
+    if not file: return redirect(url_for('admin'))
+    path = os.path.join('/tmp', 'registry.csv')
+    file.save(path)
+    df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore')
     rows = df.to_dict(orient='records')
-    
-    sent, failed_list = 0, []
+    sent = 0
     for row in rows:
-        def find_val(keys):
-            for k in keys:
+        def f(ks):
+            for k in ks:
                 for rk in row.keys():
-                    if str(k).lower().strip().replace(" ","") == str(rk).lower().strip().replace(" ",""): return row[rk]
+                    if str(k).lower().replace(" ","") == str(rk).lower().replace(" ",""): return row[rk]
             return ""
-        
-        email = str(find_val(['Email', 'MailId', 'EmailID', 'Mail Id'])).strip()
-        if not email or not EMAIL_REGEX.match(email):
-            failed_list.append({'name': str(find_val(['TeamName', 'Name of The Student'])), 'email': email, 'reason': 'Invalid Format'})
-            continue
-            
-        pid = find_val(['ProjectID', 'Batch NO'])
-        name = str(find_val(['TeamName', 'Name of The Student'])).strip() or 'Unknown'
-        title = find_val(['ProjectTitle', 'Problem Statement'])
-
-        body = f"""Dear Student {name},
-
-Greetings from PRAKALP IoT Hackathon Team!
-
-We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
-
-Hackathon Project ID: {pid}
-Problem Statement: "{title}"
-
-You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
-
-Official WhatsApp Group:
-https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
-All participants must join the group for further updates and communication.
-
-If you have any queries, please contact the organizing team.
-
-Wishing you all the best for your hackathon journey!
-
-Regards,
-PRAKALP IoT Admin Team"""
-        
-        try:
+        email = str(f(['Email', 'MailId'])).strip()
+        if "@" in email:
+            pid, name, title = f(['ProjectID', 'Batch NO']), f(['TeamName', 'Name']), f(['ProjectTitle', 'Problem'])
+            body = f"Dear Student {name},\n\nYour problem statement: {title}\nProject ID: {pid}\n\nGood luck!"
             send_real_email(email, f"PRAKALP Assignment: {pid}", body)
             sent += 1
-        except Exception as e:
-            failed_list.append({'name': name, 'email': email, 'reason': str(e)[:50]})
-    
-    session['failed_emails'] = failed_list
-    return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&step1_done=1&tab=setup')
+    return redirect(url_for('admin') + f'?emailed=1&sent={sent}')
 
 @app.route('/finalize_registry', methods=['POST'])
 def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    csv_path = os.path.join('/tmp', 'latest_registry.csv')
-    xlsx_path = os.path.join('/tmp', 'latest_registry.xlsx')
-    target = csv_path if os.path.exists(csv_path) else (xlsx_path if os.path.exists(xlsx_path) else None)
-    
-    if not target: return redirect(url_for('admin') + '?error=no_registry_temp&tab=setup')
-    initialize_db(target)
-    return redirect(url_for('admin') + '?registered=1&tab=setup')
+    path = os.path.join('/tmp', 'registry.csv')
+    if os.path.exists(path): initialize_db(path)
+    return redirect(url_for('admin') + '?registered=1')
 
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     initialize_db()
-    return redirect(url_for('admin') + '?reset=1&tab=setup')
+    return redirect(url_for('admin') + '?reset=1')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
