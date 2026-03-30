@@ -4,6 +4,7 @@ import smtplib
 from email.message import EmailMessage
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import json
+import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = 'prakalp-secure-iot-key-2026'
@@ -103,22 +104,35 @@ HEADERS.extend(['R1_Total', 'R2_Total', 'R3P1_Total', 'R3P2_Total', 'R4_Total', 
 # 📥 DB INITIALIZATION
 # ==============================
 def initialize_db(registry_path=None):
+    """Seed the database from a registry CSV or fallback to Proposal Matrix."""
     os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
     data = []
     
     if registry_path and os.path.exists(registry_path):
-        with open(registry_path, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                team_row = {
-                    'TeamID': row.get('TeamID', row.get('S.No', '')),
-                    'ProjectID': row.get('ProjectID', ''),
-                    'TeamName': row.get('TeamName', ''),
-                    'ProjectTitle': row.get('ProjectTitle', ''),
-                    'Email': str(row.get('LeaderEmail', row.get('Email', ''))).strip()
-                }
-                for field in HEADERS[5:]: team_row[field] = 0
-                data.append(team_row)
+        if registry_path.endswith('.csv'):
+            with open(registry_path, mode='r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                rows = list(reader)
+        else:
+            df = pd.read_excel(registry_path)
+            rows = df.to_dict(orient='records')
+
+        for row in rows:
+            # 🕵️ SMART MAPPING for PSList.xlsx and other common formats
+            email = str(row.get('Mail Id') or row.get('LeaderEmail') or row.get('Email') or "").strip()
+            
+            # Skip invalid/header rows
+            if not email or "@" not in email: continue
+
+            team_row = {
+                'TeamID': row.get('S.No') or row.get('TeamID') or "",
+                'ProjectID': row.get('Batch NO') or row.get('ProjectID') or "",
+                'TeamName': row.get('Name of The Student') or row.get('TeamName') or "",
+                'ProjectTitle': row.get('Problem Statement') or row.get('ProjectTitle') or "",
+                'Email': email
+            }
+            for field in HEADERS[5:]: team_row[field] = 0
+            data.append(team_row)
     else:
         if os.path.exists(PROPOSAL_FILE):
             with open(PROPOSAL_FILE, mode='r', encoding='utf-8') as f:
@@ -226,10 +240,13 @@ def update_scores():
 
 @app.route('/upload_registry', methods=['POST'])
 def upload_registry():
+    """Admin initializes the DB from an uploaded CSV or XLSX."""
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    
     file = request.files.get('registry_file')
-    if file and file.filename.endswith('.csv'):
-        temp_path = os.path.join(BASE_DIR, 'data', 'temp_registry.csv')
+    if file and (file.filename.endswith('.csv') or file.filename.endswith('.xlsx')):
+        ext = '.csv' if file.filename.endswith('.csv') else '.xlsx'
+        temp_path = os.path.join(BASE_DIR, 'data', f'temp_registry{ext}')
         file.save(temp_path)
         initialize_db(temp_path)
         os.remove(temp_path)
@@ -238,10 +255,32 @@ def upload_registry():
 
 @app.route('/send_startup_emails', methods=['POST'])
 def send_startup_emails():
+    """Iterate through all registered teams and dispatch official hackathon credentials."""
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    
     for t in get_teams():
-        body = f"Welcome {t.get('TeamName')}!\n\nYour officially assigned Hackathon Project ID is: {t.get('ProjectID')} for your proposal '{t.get('ProjectTitle')}'.\n\nBest of luck!\n\n- PRAKALP IoT Admin"
-        send_real_email(t.get('Email', ''), "PRAKALP IoT Hackathon: Your Project ID!", body)
+        body = f"""Dear Student ({t.get('TeamName')}),
+
+Greetings from PRAKALP IoT Hackathon Team!
+
+We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
+
+Hackathon Project ID: {t.get('ProjectID')}
+Problem Statement: "{t.get('ProjectTitle')}"
+
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+
+Official WhatsApp Group:
+https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
+All participants must join the group for further updates and communication.
+
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your hackathon journey!
+
+Regards,
+PRAKALP IoT Admin Team"""
+        send_real_email(t.get('Email', ''), f"PRAKALP IoT Hackathon: Project Assignment ({t.get('ProjectID')})", body)
     return redirect(url_for('admin') + '?emailed=1')
 
 @app.route('/announce_prize', methods=['POST'])
