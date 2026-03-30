@@ -6,4 +6,3 @@ __pycache__/
 .DS_Store
 ~$*
 data/temp_registry.csv
-data/hackathon_detailed_scores.csv
