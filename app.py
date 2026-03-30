@@ -4,10 +4,14 @@ import smtplib
 from email.message import EmailMessage
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import json
+import re
 import pandas as pd
 
 app = Flask(__name__)
 app.secret_key = 'prakalp-secure-iot-key-2026'
+
+# 🌐 UNIVERSAL EMAIL VALIDATOR
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 
 # ==============================
 # 🔐 EMAIL CONFIG (UPDATE THIS)
@@ -278,7 +282,11 @@ def upload_dispatch():
             return ""
         
         email = str(find_val(['Email', 'MailId', 'EmailID', 'Mail Id'])).strip()
-        if not email or "@" not in email:
+        
+        # 🛡️ Real-Time Typo Shielding
+        if not email or not EMAIL_REGEX.match(email):
+            reason = 'Invalid Format (Check for spaces or typos)'
+            failed_list.append({'name': name, 'email': email, 'reason': reason})
             continue
             
         pid = find_val(['ProjectID', 'Batch NO'])
@@ -367,8 +375,10 @@ def send_startup_emails():
         email = t.get('Email', '').strip()
         
         # 🛡️ Safety Filter (Shared logic with send_real_email)
-        if not email or "placeholder" in email or "@" not in email:
+        # 🛡️ Real-Time Typo Shielding (Filter invalid emails)
+        if not email or not EMAIL_REGEX.match(email) or "placeholder" in email:
             skip_count += 1
+            print(f"[SHIELD] Blocked invalid delivery to: {email}")
             continue
 
         body = f"""Dear Student ({t.get('TeamName')}),
