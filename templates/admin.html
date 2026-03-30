@@ -265,6 +265,77 @@
 
 
 
+        /* ─── Step 2 locked state ─── */
+        .step2-locked { opacity: 0.45; pointer-events: none; filter: saturate(0.3); }
+
+        /* ─── Loading Overlay ─── */
+        #loadingOverlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+        #loadingOverlay.show { display: flex; }
+        .spinner-ring {
+            width: 72px; height: 72px;
+            border: 6px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary-neon);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-dots span {
+            display: inline-block;
+            animation: blink 1.4s infinite both;
+            font-size: 1.6rem;
+            color: var(--primary-neon);
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+        /* ─── Success Popup Modal ─── */
+        #successPopup {
+            display: none;
+            position: fixed; inset: 0; z-index: 9998;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+        }
+        #successPopup.show { display: flex; }
+        .popup-card {
+            background: linear-gradient(135deg, #0d1b2a, #0a1628);
+            border-radius: 20px;
+            padding: 48px 56px;
+            text-align: center;
+            border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 60px color-mix(in srgb, var(--primary-neon) 25%, transparent);
+            max-width: 480px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .popup-icon { font-size: 4rem; margin-bottom: 16px; }
+        .popup-title { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--primary-neon); margin-bottom: 8px; }
+        .popup-sub { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+        .popup-close {
+            margin-top: 28px;
+            padding: 10px 32px;
+            background: var(--primary-neon);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+        .popup-close:hover { opacity: 0.8; }
+
         /* ─── Responsive ─── */
         @media (max-width: 900px) {
             .admin-header { flex-wrap: wrap; }
@@ -279,6 +350,22 @@
     <!-- 🌍 Global Navbar 🌍 -->
     {% include 'header.html' %}
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner-ring"></div>
+        <p id="loadingText" style="color:#fff; font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:600;">Sending emails...</p>
+        <div class="loading-dots"><span>●</span><span>●</span><span>●</span></div>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="successPopup">
+        <div class="popup-card">
+            <div class="popup-icon" id="popupIcon">✅</div>
+            <div class="popup-title" id="popupTitle">Success!</div>
+            <div class="popup-sub" id="popupSub">Operation completed successfully.</div>
+            <button class="popup-close" onclick="closePopup()">OK, Got it!</button>
+        </div>
+    </div>
 
 
     <!-- ═══ Round Tabs ═══ -->
@@ -305,20 +392,44 @@
             <p>Upload a Teams Registry Excel/CSV file to organically assign Project IDs and safely initialize the tournament.</p>
         </div>
         <div class="glass-card" style="padding: 24px;">
-            <form action="/upload_registry" method="post" enctype="multipart/form-data" style="margin-bottom: 24px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">1. Upload Teams Database (.csv)</label>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <input type="file" name="registry_file" accept=".csv" required style="border: 1px dashed var(--glass-border); padding: 12px; border-radius: var(--radius-md); background: rgba(0,0,0,0.2); color: var(--text-secondary); width: 100%;">
-                    <button type="submit" class="btn-primary" style="white-space: nowrap; height: 100%;">📁 Read & Initialize</button>
-                </div>
-                <small style="color: var(--text-secondary); display: block; margin-top: 8px;">Columns expected: TeamID, ProjectID, TeamName, ProjectTitle, LeaderEmail</small>
-            </form>
-            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 24px 0;">
-            <form action="/send_startup_emails" method="post" onsubmit="return confirm('Are you absolutely certain you want to blast dispatch emails notifying all {{ teams|length }} teams of their assigned Project ID?');">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">2. Dispatch Verification Sequence</label>
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Trigger an automated broadcast strictly pushing Project IDs natively to all registered emails so that evaluators and participants converge dynamically.</p>
-                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; background: color-mix(in srgb, var(--accent-gold) 80%, black); color: #000; font-weight: 700;">
-                    🚀 Dispatch Project ID Emails
+            <!-- 🔥 STEP 1: DISPATCH & BROADCAST -->
+            <div style="border: 1px solid var(--accent-gold); padding: 20px; border-radius: 12px; margin-bottom: 24px; background: rgba(255, 183, 77, 0.05);">
+                <h4 style="color: var(--accent-gold); margin-bottom: 12px; font-family: 'Outfit', sans-serif;">Step 1: Broadcast Project Assignments</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                    Upload your <strong>PSList.csv</strong>. The system will instantaneously send all Project ID emails to the students found in the file.
+                </p>
+                <form action="/upload_dispatch" method="post" enctype="multipart/form-data">
+                    <input type="file" name="registry_file" accept=".csv,.xlsx" required 
+                           style="border: 1px dashed var(--accent-gold); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); color: var(--text-secondary); width: 100%; margin-bottom: 15px;">
+                    <button type="submit" class="btn-primary" 
+                            style="width: 100%; justify-content: center; background: var(--accent-gold); color: #000; font-weight: 800;">
+                        🚀 STEP 1: UPLOAD & DISPATCH EMAILS
+                    </button>
+                </form>
+            </div>
+
+            <!-- 📁 STEP 2: FINALIZE & INITIALIZE DASHBOARD -->
+            <div style="border: 1px solid var(--primary-neon); padding: 20px; border-radius: 12px; margin-bottom: 24px; background: rgba(0, 243, 255, 0.05);"
+                 class="{% if not request.args.get('step1_done') %}step2-locked{% endif %}">
+                <h4 style="color: var(--primary-neon); margin-bottom: 12px; font-family: 'Outfit', sans-serif;">Step 2: Initialize Evaluation Dashboard</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                    Once your emails are successful, click here to formally anchor the teams into the scoring dashboard.
+                </p>
+                <form action="/finalize_registry" method="post">
+                    <button type="submit" class="btn-primary" 
+                            style="width: 100%; justify-content: center; background: var(--primary-neon); color: #000; font-weight: 800;"
+                            {% if not request.args.get('step1_done') %}disabled title="Complete Step 1 First"{% endif %}>
+                        📂 STEP 2: FINALIZE TEAM REGISTRY
+                    </button>
+                </form>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 30px 0;">
+            
+            <form action="/reset_db" method="post" onsubmit="return confirm('🚨 DANGER: This will delete ALL 39 teams and all scores! Proceed?');">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Emergency Zone: Reset Everything</label>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #FF5252 0%, #B71C1C 100%); color: #fff; font-weight: 700; border: none;">
+                    🗑️ Factory Reset Dashboard
                 </button>
             </form>
         </div>
@@ -420,15 +531,60 @@
 
         {% endfor %}
 
-          {% if request.args.get('emailed') %}
-            <div class="banner" style="background: #1b5e20; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #4caf50;">
-                🚀 <strong>Mass Dispatch Complete!</strong> 
-                <span style="margin-left:15px; background:rgba(0,0,0,0.2); border-radius:4px; padding:2px 8px;">
-                    Sent: {{ request.args.get('sent', '0') }}
-                </span>
-                <span style="margin-left:15px; color:#ffdddd;">
-                    Skipped: {{ request.args.get('skipped', '0') }}
-                </span>
+        {% if request.args.get('emailed') %}
+            {% set failed_count = request.args.get('failed', '0')|int %}
+            {% set sent_count = request.args.get('sent', '0')|int %}
+            {% if failed_count == 0 %}
+                <div class="banner" style="background: #1b5e20; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 32px; border: 1px solid #4caf50;">
+                    ✅ <strong>Broadcast Complete!</strong> All <strong>{{ sent_count }}</strong> emails delivered successfully. No failures.
+                </div>
+            {% else %}
+                <div class="banner" style="background: #1b5e20; color: #fff; padding: 12px 15px; border-radius: 8px 8px 0 0; margin: 20px 32px 0; border: 1px solid #4caf50;">
+                    ✅ <strong>{{ sent_count }} Emails Sent</strong> &nbsp;|&nbsp; ❌ <strong>{{ failed_count }} Failed</strong>
+                </div>
+                <div style="background: #1a0a0a; border: 1px solid #f44336; border-top: none; border-radius: 0 0 8px 8px; margin: 0 32px 20px; padding: 16px;">
+                    <p style="color: #ff5252; font-weight: 700; margin-bottom: 12px;">⚠️ The following emails could NOT be delivered:</p>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,82,82,0.3);">
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">#</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Student Name</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Email Address</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Failure Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in session.get('failed_emails', []) %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                                <td style="padding:8px; color:#aaa;">{{ loop.index }}</td>
+                                <td style="padding:8px; color:#fff; font-weight:600;">{{ f.name }}</td>
+                                <td style="padding:8px; color:#90caf9; font-family:monospace;">{{ f.email }}</td>
+                                <td style="padding:8px; color:#ff5252;">🔴 {{ f.reason }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if request.args.get('registered') %}
+            <div class="banner" style="background: #004d40; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #1de9b6; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                ✅ ✨ <strong>SUCCESSFULLY INITIALIZED!</strong>
+                <br><span style="font-size: 0.95rem; opacity: 0.9;">All teams from your PSList are now formally registered and visible on the scoring dashboard.</span>
+            </div>
+        {% endif %}
+
+        {% if request.args.get('error') == 'file_locked' %}
+            <div class="banner" style="background: #b71c1c; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #f44336;">
+                ⚠️ <strong>PERMISSION DENIED!</strong> Your spreadsheet is OPEN IN EXCEL.
+                <br><span style="font-size: 0.9rem; opacity: 0.9;">Please CLOSE ALL EXCEL WINDOWS and try resetting again.</span>
+            </div>
+        {% endif %}
+
+        {% if request.args.get('reset') %}
+            <div class="banner" style="background: #e65100; color: #fff; padding: 12px; border-radius: 8px; margin: 20px 0;">
+                🗑️ <strong>Tournament Reset Complete!</strong> All entries and scores have been wiped.
             </div>
         {% endif %}
 
@@ -506,6 +662,43 @@
 
         // ─── Initialize all live totals on page load ───
         document.addEventListener('DOMContentLoaded', () => {
+            // Check for tab persistence
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('tab') === 'setup') switchRound('setup');
+
+            // ─── SUCCESS POPUPS ───
+            if (params.get('emailed') === '1') {
+                const sent = params.get('sent') || '?';
+                const failed = parseInt(params.get('failed') || '0');
+                if (failed === 0) {
+                    showPopup('📧', 'Emails Sent!', `All ${sent} project assignment emails were delivered successfully to the students.`);
+                } else {
+                    showPopup('⚠️', `${sent} Sent, ${failed} Failed`, `Some emails could not be delivered. Check the failure list below for details.`, true);
+                }
+            }
+            if (params.get('registered') === '1') {
+                showPopup('🎉', 'Teams Initialized!', 'All teams are now formally registered in the evaluation dashboard and ready for scoring.');
+            }
+            if (params.get('reset') === '1') {
+                showPopup('🗑️', 'Dashboard Reset!', 'All team data and scores have been wiped. Upload a new PSList.csv to start fresh.', true);
+            }
+
+            // ─── LOADING OVERLAY on form submit ───
+            const step1Form = document.querySelector('form[action="/upload_dispatch"]');
+            if (step1Form) {
+                step1Form.addEventListener('submit', () => {
+                    document.getElementById('loadingText').textContent = 'Sending ' + '{{ teams|length }}' + ' emails, please wait...';
+                    document.getElementById('loadingOverlay').classList.add('show');
+                });
+            }
+            const step2Form = document.querySelector('form[action="/finalize_registry"]');
+            if (step2Form) {
+                step2Form.addEventListener('submit', () => {
+                    document.getElementById('loadingText').textContent = 'Initializing teams into dashboard...';
+                    document.getElementById('loadingOverlay').classList.add('show');
+                });
+            }
+
             const selector = document.getElementById('themeSelector');
             if (selector) selector.value = document.documentElement.getAttribute('data-theme');
 
@@ -516,6 +709,24 @@
                 });
             });
         });
+
+        function showPopup(icon, title, sub, isWarning = false) {
+            document.getElementById('popupIcon').textContent = icon;
+            document.getElementById('popupTitle').textContent = title;
+            document.getElementById('popupSub').textContent = sub;
+            const card = document.querySelector('.popup-card');
+            card.style.borderColor = isWarning ? '#ff9800' : 'var(--primary-neon)';
+            card.style.boxShadow = isWarning
+                ? '0 0 60px rgba(255,152,0,0.25)'
+                : '0 0 60px color-mix(in srgb, var(--primary-neon) 25%, transparent)';
+            document.getElementById('successPopup').classList.add('show');
+            // Auto-close after 5 seconds
+            if (!isWarning) setTimeout(closePopup, 5000);
+        }
+
+        function closePopup() {
+            document.getElementById('successPopup').classList.remove('show');
+        }
 
         // ─── Save via form submit + show toast ───
         async function saveScores() {

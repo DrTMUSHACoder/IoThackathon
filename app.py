@@ -104,7 +104,7 @@ HEADERS.extend(['R1_Total', 'R2_Total', 'R3P1_Total', 'R3P2_Total', 'R4_Total', 
 # 📥 DB INITIALIZATION
 # ==============================
 def initialize_db(registry_path=None):
-    """Seed the database from a registry CSV or fallback to Proposal Matrix."""
+    """Seed the database from a registry CSV/Excel or Wipe it clean."""
     os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
     data = []
     
@@ -149,25 +149,18 @@ def initialize_db(registry_path=None):
             
         print(f"[DB] SUCCESS: Logged {len(data)} valid teams into the system.")
     else:
-        if os.path.exists(PROPOSAL_FILE):
-            with open(PROPOSAL_FILE, mode='r', encoding='utf-8') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    sno = row.get('S.No', '')
-                    team_row = {
-                        'TeamID': sno,
-                        'ProjectID': f"PID-{str(sno).zfill(2)}",
-                        'TeamName': f"Team {str(sno).zfill(2)}" if sno else "Unknown Team",
-                        'ProjectTitle': row.get('Project Title', ''),
-                        'Email': 'placeholder@example.com' # 🛑 SAFETY FILTER WILL SKIP THIS
-                    }
-                    for field in HEADERS[5:]: team_row[field] = 0
-                    data.append(team_row)
+        # 🧹 FULL WIPE MODE: If no registry is provided, initialize as empty.
+        print("[DB] RESET: Emptying tournament records for a fresh slate.")
+        data = [] # Empty list = No teams
 
-    with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=HEADERS)
-        writer.writeheader()
-        writer.writerows(data)
+    try:
+        with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=HEADERS)
+            writer.writeheader()
+            writer.writerows(data)
+    except PermissionError:
+        print(f"[ERROR] Cannot write to {DATA_FILE}. It is OPEN IN EXCEL. Please close it first!")
+        raise Exception("FILE_LOCKED")
 
 def get_teams():
     if not os.path.exists(DATA_FILE): initialize_db()
@@ -253,20 +246,94 @@ def update_scores():
         writer.writerows(current_teams)
     return redirect(url_for('admin') + '?saved=1')
 
-@app.route('/upload_registry', methods=['POST'])
-def upload_registry():
-    """Admin initializes the DB from an uploaded CSV or XLSX."""
+@app.route('/upload_dispatch', methods=['POST'])
+def upload_dispatch():
+    """STEP 1: Upload Excel/CSV and Broadcast Emails immediately."""
+    if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    file = request.files.get('registry_file')
+    if not file: return redirect(url_for('admin') + '?error=no_file')
+
+    ext = '.csv' if file.filename.endswith('.csv') else '.xlsx'
+    temp_path = os.path.join(BASE_DIR, 'data', f'latest_registry{ext}')
+    file.save(temp_path)
+
+    # 1. Parse File using industrial scanner
+    data_to_send = []
+    if ext == '.csv':
+        df = pd.read_csv(temp_path, sep=None, engine='python', encoding_errors='ignore')
+    else:
+        df = pd.read_excel(temp_path)
+    
+    df.columns = [str(c).strip() for c in df.columns]
+    rows = df.to_dict(orient='records')
+    
+    sent = 0
+    failed_list = []  # Store detailed failure info
+
+    for row in rows:
+        def find_val(keys):
+            for k in keys:
+                for rk in row.keys():
+                    if str(k).lower().strip().replace(" ","") == str(rk).lower().strip().replace(" ",""): return row[rk]
+            return ""
+        
+        email = str(find_val(['Email', 'MailId', 'EmailID', 'Mail Id'])).strip()
+        if not email or "@" not in email:
+            continue
+            
+        pid = find_val(['ProjectID', 'Batch NO'])
+        name = str(find_val(['TeamName', 'Name of The Student'])).strip() or 'Unknown'
+        title = find_val(['ProjectTitle', 'Problem Statement'])
+
+        body = f"Dear Student ({name}),\n\nGreetings from PRAKALP Team!\n\nYour assigned Project ID is: {pid}\nProblem Statement: {title}\n\nOfficial WhatsApp: https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t"
+        
+        try:
+            send_real_email(email, f"PRAKALP Assignment: {pid}", body)
+            sent += 1
+        except Exception as e:
+            err_msg = str(e)
+            # Translate technical errors into human-readable reasons
+            if 'getaddrinfo' in err_msg or 'Network' in err_msg or 'timed out' in err_msg:
+                reason = 'Network Error (no internet connection)'
+            elif 'Authentication' in err_msg or '535' in err_msg or 'Username' in err_msg:
+                reason = 'Authentication Failed (check Gmail App Password)'
+            elif 'SMTPRecipientsRefused' in err_msg or '550' in err_msg:
+                reason = 'Invalid Email Address (rejected by mail server)'
+            elif 'SMTPConnectError' in err_msg or 'Connection refused' in err_msg:
+                reason = 'SMTP Connection Error (Gmail server unreachable)'
+            else:
+                reason = f'Unknown Error: {err_msg[:60]}'
+            failed_list.append({'name': name, 'email': email, 'reason': reason})
+            print(f'[FAILED] {name} <{email}>: {reason}')
+    
+    # Store failed list in session for display
+    session['failed_emails'] = failed_list
+    return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&step1_done=1&tab=setup')
+
+@app.route('/finalize_registry', methods=['POST'])
+def finalize_registry():
+    """STEP 2: Initialize the dashboard after successful broadcast."""
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     
-    file = request.files.get('registry_file')
-    if file and (file.filename.endswith('.csv') or file.filename.endswith('.xlsx')):
-        ext = '.csv' if file.filename.endswith('.csv') else '.xlsx'
-        temp_path = os.path.join(BASE_DIR, 'data', f'temp_registry{ext}')
-        file.save(temp_path)
-        initialize_db(temp_path)
-        os.remove(temp_path)
-        return redirect(url_for('admin') + '?registered=1')
-    return redirect(url_for('admin') + '?error=invalid_file')
+    csv_path = os.path.join(BASE_DIR, 'data', 'latest_registry.csv')
+    xlsx_path = os.path.join(BASE_DIR, 'data', 'latest_registry.xlsx')
+    
+    target = csv_path if os.path.exists(csv_path) else xlsx_path
+    if not os.path.exists(target): return redirect(url_for('admin') + '?error=no_registry_temp&tab=setup')
+    
+    initialize_db(target)
+    return redirect(url_for('admin') + '?registered=1&tab=setup')
+
+@app.route('/reset_db', methods=['POST'])
+def reset_db():
+    if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    try:
+        initialize_db()
+        return redirect(url_for('admin') + '?reset=1&tab=setup')
+    except Exception as e:
+        if "FILE_LOCKED" in str(e):
+            return redirect(url_for('admin') + '?error=file_locked&tab=setup')
+        raise e
 
 @app.route('/send_startup_emails', methods=['POST'])
 def send_startup_emails():
@@ -284,7 +351,7 @@ def send_startup_emails():
             skip_count += 1
             continue
 
-        body = f"""Dear Student ({t.get('TeamName')}),
+        body = f"""Dear Student {t.get('TeamName')},
 
 Greetings from PRAKALP IoT Hackathon Team!
 

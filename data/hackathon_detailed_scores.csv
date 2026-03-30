@@ -1,46 +1,40 @@
 TeamID,ProjectID,TeamName,ProjectTitle,Email,R1_Innovation,R1_ProblemRelevance,R1_TechFeasibility,R1_ClarityPresentation,R2_FeasibilityValidation,R2_SystemDesignLogic,R2_DemoQuality,R2_TechnicalUnderstanding,R3P1_InitialImplementation,R3P1_ApproachMethodology,R3P1_ProgressLevel,R3P1_TeamCoordination,R3P2_ImprovementPhase1,R3P2_InnovationModification,R3P2_ProblemSolvingApproach,R3P2_StabilityFunctionality,R4_Innovation,R4_WorkingPrototype,R4_RealTimeImpact,R4_PresentationSkills,R4_QAHandling,R1_Total,R2_Total,R3P1_Total,R3P2_Total,R4_Total,Weighted_Total,Raw_Total
-01,PID-01,Team 01,IoT Based Automated Fire Fighting Robot using Arduino and Flame Sensors,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-02,PID-02,Team 02,Autonomous Human Following Robot System using Arduino and IR Logic,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-03,PID-03,Team 03,Smartphone Bluetooth Controlled Robot System for Remote Exploration using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-04,PID-04,Team 04,Autonomous Firefront Mapping and Wireless Safety Rover System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-05,PID-05,Team 05,Smart Blind Spot Radar Integrated Cycle Handle Vibration Alert System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-06,PID-06,Team 06,IoT Based Agriculture Monitoring and Soil Analysis System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-07,PID-07,Team 07,IoT Based Automated Crop Irrigation Monitoring System using Arduino and Relay,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-08,PID-08,Team 08,IoT Based Smart Remote Irrigation Monitoring and Control System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-09,PID-09,Team 09,Smart Agriculture Soil Humidity and Nutrient Loop Control System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-10,PID-10,Team 10,Automated Smart Plant Aquaponics Controlling System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-11,PID-11,Team 11,Smart Agricultural Grain Warehouse Heat Map and Aeration System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-12,PID-12,Team 12,Anti-Theft Security and Sidewalk Navigation Assistive System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-13,PID-13,Team 13,IoT Based Industrial Safety Monitoring and Hazard Alerting System using NodeMCU Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-14,PID-14,Team 14,IoT Based Gas and Flame Detection Safety Alerting System using ESP32/WiFi Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-15,PID-15,Team 15,Synced Multi-Room Fire Evacuation and Emergency Sync Alarm System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-16,PID-16,Team 16,Home Security Anti-Theft Floor Mat Intrusion Detection System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-17,PID-17,Team 17,IV Line Air-Embolism Prevention and Flow Stopper Safety System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-18,PID-18,Team 18,Automated Smart Home Bathroom Aerated Occupancy Sensing System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-19,PID-19,Team 19,Automated Industrial Area Safety and Hazard Lockout System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-20,PID-20,Team 20,IoT Based Smart Helmet Access and Safety Enforcement System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-21,PID-21,Team 21,IoT Based Air Smoke and Alcohol Detection Alerting System (MQ2/MQ3 Proxies),placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-22,PID-22,Team 22,Automated Public Park Bushfire Detection and Alarm System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-23,PID-23,Team 23,Autonomous Firefront Mapping and Safety Rover Navigation Hub using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-24,PID-24,Team 24,IoT Based Patient Health Monitoring and Vital Tracking System using NodeMCU Station,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-25,PID-25,Team 25,Heart Disease Prediction using Wearable IoT Sensors and WiFi Link Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-26,PID-26,Team 26,EMIT (Emergency Medical Information Tracker): Alert System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-27,PID-27,Team 27,Heart Disease Detection and Prediction via Wearable Proximity Sensors Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-28,PID-28,Team 28,SMART Shopping Card: RFID/Proximity Based Item Billing System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-29,PID-29,Team 29,RFICS Toll Gate and Automated Vehicle Clearance System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-30,PID-30,Team 30,Smart Parking Space Monitoring System using IR Sensors and WiFi Station,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-31,PID-31,Team 31,Automatic Door Lock/Unlock System using IR Sensing and Servo Control Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-32,PID-32,Team 32,IoT Based Weather and Air Quality Monitoring System using DHT and WiFi Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-33,PID-33,Team 33,IoT Based Smart Air Quality Purifying and Fan Aeration System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-34,PID-34,Team 34,IoT Based Room Temperature and Central Humidity Controlling System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-35,PID-35,Team 35,IoT Based School Classroom Presence and Monitoring System using Arduino/WiFi Link,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-36,PID-36,Team 36,Smart Corridor Energy Fan and Climate Controlling System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-37,PID-37,Team 37,Bus Door Safe Zone Footboard Occupancy Monitoring System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-38,PID-38,Team 38,Cycle Blind Spot Warning and Side-Facing Cycle Bell Safety System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-39,PID-39,Team 39,Automated Wet and Dry Waste Auto-Segregation Bin System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-40,PID-40,Team 40,Smart Refrigerator Energy Saving and Door-Open Warning System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-41,PID-41,Team 41,Energy Real-time Monitoring and Power Cut-off System using Arduino Relay Station,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-42,PID-42,Team 42,Public Transport Tracking and Arrival Notification System using WiFi Hub Hub,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-43,PID-43,Team 43,Bus Student Count Tracking and Overcrowding Alert System using Arduino,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-44,PID-44,Team 44,WiFi Integrated Neighborhood Urban Heat Island Monitoring System using Raspberry Pi,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-45,PID-45,Team 45,WiFi Integrated Municipal Storage Tank Leakage Prediction System using Raspberry Pi,placeholder@example.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+1.0,PR-IOT-1A-001,M.Akshaya,IoT Based Automated Fire Fighting Robot using Arduino and Flame Sensors,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2.0,PR-IOT-1A-002,Ammalakanti Amulya ,Autonomous Human Following Robot System using Arduino and IR Logic,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+3.0,PR-IOT-1A-003,SHILPIKA ANAGANI ,Smartphone Bluetooth Controlled Robot System for Remote Exploration using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+4.0,PR-IOT-1A-004,Katta pravallika,Autonomous Firefront Mapping and Wireless Safety Rover System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5.0,PR-IOT-1A-005,Ganisetty Monika krishna ,Smart Blind Spot Radar Integrated Cycle Handle Vibration Alert System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+6.0,PR-IOT-1A-006,Roshini,IoT Based Agriculture Monitoring and Soil Analysis System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+7.0,PR-IOT-1A-007,Neelagiri sai muneesh ,IoT Based Automated Crop Irrigation Monitoring System using Arduino and Relay,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+8.0,PR-IOT-1A-008,Priya Darshini,IoT Based Smart Remote Irrigation Monitoring and Control System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+9.0,PR-IOT-1A-009,P.Sai Subhash,Smart Agriculture Soil Humidity and Nutrient Loop Control System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+10.0,PR-IOT-1A-010,Aishwarya,Automated Smart Plant Aquaponics Controlling System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+11.0,PR-IOT-1A-011,Gariganti Murali Krishna ,Smart Agricultural Grain Warehouse Heat Map and Aeration System using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+12.0,PR-IOT-1A-012,Ch ishwarya ,Anti-Theft Security and Sidewalk Navigation Assistive System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+13.0,PR-IOT-1A-013,K.Gnanamani,IoT Based Industrial Safety Monitoring and Hazard Alerting System using NodeMCU Hub,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+14.0,PR-IOT-1A-014,B.Bhanu Sri Sarayu ,IoT Based Gas and Flame Detection Safety Alerting System using ESP32/WiFi Hub,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+15.0,PR-IOT-1A-015,B. Veera naga suresh,Synced Multi-Room Fire Evacuation and Emergency Sync Alarm System using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+16.0,PR-IOT-1A-016,Putti Daiva Paul,Home Security Anti-Theft Floor Mat Intrusion Detection System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+17.0,PR-IOT-1A-017,G.Neelima ,IV Line Air-Embolism Prevention and Flow Stopper Safety System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+18.0,PR-IOT-1A-018,Janga. Donald ,Automated Smart Home Bathroom Aerated Occupancy Sensing System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+19.0,PR-IOT-1A-019,Allu Siva Malleswari ,Automated Industrial Area Safety and Hazard Lockout System using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+20.0,PR-IOT-1A-020,Gunakala Devi Sowmya ,IoT Based Smart Helmet Access and Safety Enforcement System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+21.0,PR-IOT-1A-021,TRIPARNA PRATYUSHA ,IoT Based Air Smoke and Alcohol Detection Alerting System (MQ2/MQ3 Proxies),drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+22.0,PR-IOT-1A-022,Uppala Anjali Sushmitha ,Automated Public Park Bushfire Detection and Alarm System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+23.0,PR-IOT-1A-023,Purapu Anusha ,Autonomous Firefront Mapping and Safety Rover Navigation Hub using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+24.0,PR-IOT-1A-024,Nalli. Rajeswari,IoT Based Patient Health Monitoring and Vital Tracking System using NodeMCU Station,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+25.0,PR-IOT-1A-025,K sriya prasanna ,Heart Disease Prediction using Wearable IoT Sensors and WiFi Link Hub,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+26.0,PR-IOT-1A-026,V. Pragna sri valli,EMIT (Emergency Medical Information Tracker): Alert System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+27.0,PR-IOT-1A-027,B.Geetha sri,Heart Disease Detection and Prediction via Wearable Proximity Sensors Hub,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+28.0,PR-IOT-1A-028,S Babi,SMART Shopping Card: RFID/Proximity Based Item Billing System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+29.0,PR-IOT-1A-029,G.Prem Kumar,RFICS Toll Gate and Automated Vehicle Clearance System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+30.0,PR-IOT-1A-030,T. Sunny ,Smart Parking Space Monitoring System using IR Sensors and WiFi Station,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+31.0,PR-IOT-1A-031,Saladi Mohan Ganesh ,Automatic Door Lock/Unlock System using IR Sensing and Servo Control Hub,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+32.0,PR-IOT-1A-032,Manepalli Venkata Siva Sri Harikrishna ,IoT Based Weather and Air Quality Monitoring System using DHT and WiFi Hub,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+33.0,PR-IOT-1A-033,Angara Malika,IoT Based Smart Air Quality Purifying and Fan Aeration System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+34.0,PR-IOT-1A-034,Velagala Bindu ,IoT Based Room Temperature and Central Humidity Controlling System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+35.0,PR-IOT-1A-035,K.Likhitha Veni,IoT Based School Classroom Presence and Monitoring System using Arduino/WiFi Link,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+36.0,PR-IOT-1A-036,Madeti Rani Vara Deepika ,Smart Corridor Energy Fan and Climate Controlling System using Arduino,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+37.0,PR-IOT-1A-037,Balusu Suhasya ,Bus Door Safe Zone Footboard Occupancy Monitoring System using Arduino,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+38.0,PR-IOT-1A-038,Ushajyothi ,Cycle Blind Spot Warning and Side-Facing Cycle Bell Safety System using Arduino,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+39.0,PR-IOT-1A-039,SK.Sohel,Automated Wet and Dry Waste Auto-Segregation Bin System using Arduino,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
