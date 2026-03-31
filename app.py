@@ -240,7 +240,8 @@ def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     if os.path.exists(REGISTRY_PATH):
         initialize_db(REGISTRY_PATH)
-    return redirect(url_for('admin') + '?registered=1&tab=setup')
+    import time
+    return redirect(url_for('admin') + f'?registered=1&tab=setup&t={int(time.time())}')
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
 import io
