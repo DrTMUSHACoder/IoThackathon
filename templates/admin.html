@@ -415,7 +415,7 @@
                 <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
                     Once your emails are successful, click here to formally anchor the teams into the scoring dashboard.
                 </p>
-                <form action="/finalize_registry" method="post">
+                <form action="/finalize_registry" method="post" onsubmit="return confirm('⚠️ CRITICAL WARNING: This will DELETE all current scores and re-initialize the entire tournament from the CSV. Are you absolutely sure?')">
                     <button type="submit" class="btn-primary" 
                             style="width: 100%; justify-content: center; background: var(--primary-neon); color: #000; font-weight: 800;"
                             {% if not request.args.get('step1_done') %}disabled title="Complete Step 1 First"{% endif %}>
