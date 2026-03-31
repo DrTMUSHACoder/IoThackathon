@@ -24,8 +24,14 @@ ADMIN_PASSWORD = 'password'
 
 # Create necessary directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TMP_DIR = os.path.join(BASE_DIR, 'data', 'tmp')
-os.makedirs(TMP_DIR, exist_ok=True)
+
+# 🚀 Vercel fix: Use /tmp for writable files in serverless environment
+if os.environ.get('VERCEL'):
+    TMP_DIR = '/tmp'
+else:
+    TMP_DIR = os.path.join(BASE_DIR, 'data', 'tmp')
+    os.makedirs(TMP_DIR, exist_ok=True)
+
 REGISTRY_PATH = os.path.join(TMP_DIR, 'registry.csv')
 
 def get_db_connection():
