@@ -87,37 +87,46 @@ def initialize_db(path=None):
         if path:
             print(f"📂 Initializing from: {path}")
             cur.execute("DELETE FROM teams;")
-            df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if path.endswith('.csv') else pd.read_excel(path)
+            c.commit() # 🔥 Immediate commit of the wipe
+            
+            df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if str(path).lower().endswith('.csv') else pd.read_excel(path)
             df.columns = [str(col).strip() for col in df.columns]
             
             for r in df.to_dict(orient='records'):
-                def f(ks, exclude=None):
-                    ks = [k.lower() for k in ks]
-                    for rk in r.keys():
-                        rk_clean = str(rk).lower().strip()
-                        if exclude and any(ex.lower() in rk_clean for ex in exclude): continue
-                        if any(k in rk_clean for k in ks): return str(r[rk]).strip()
-                    return ""
-                
-                email = f(['Email', 'Mail', 'Id'], exclude=['@']) # exclude columns that aren't the email itself
-                if "@" not in email: # try harder finding it in any field
-                    for val in r.values():
-                        if isinstance(val, str) and "@" in val:
-                            email = val.strip()
-                            break
-                
-                if "@" in email:
-                    tid = f(['Batch', 'TeamID', 'ProjectID']) or f(['No', 'ID']) or "0"
-                    pid = f(['Batch', 'ProjectID', 'PID']) or "PR-IOT"
-                    name = f(['Name', 'Student', 'Team']) or "Anonymous Team"
-                    title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
+                try:
+                    def f(ks, exclude=None):
+                        ks = [k.lower() for k in ks]
+                        for rk in r.keys():
+                            rk_clean = str(rk).lower().strip()
+                            if exclude and any(ex.lower() in rk_clean for ex in exclude): continue
+                            if any(k in rk_clean for k in ks): return str(r[rk]).strip()
+                        return ""
                     
-                    if isinstance(c, sqlite3.Connection):
-                        cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
-                    else:
-                        cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
+                    email = f(['Email', 'Mail', 'Id'], exclude=['@']) # exclude columns that aren't the email itself
+                    if "@" not in email: # try harder finding it in any field
+                        for val in r.values():
+                            if isinstance(val, str) and "@" in val:
+                                email = val.strip()
+                                break
+                    
+                    if "@" in email:
+                        tid = f(['Batch', 'TeamID', 'ProjectID']) or f(['No', 'ID']) or "0"
+                        pid = f(['Batch', 'ProjectID', 'PID']) or "PR-IOT"
+                        name = f(['Name', 'Student', 'Team']) or "Anonymous Team"
+                        title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
+                        
+                        if isinstance(c, sqlite3.Connection):
+                            cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
+                        else:
+                            cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
+                except Exception as row_err:
+                    print(f"⚠️ Row error: {row_err}")
+                    continue
+            
+            c.commit() # Final commit for inserts
             print("✅ Import finished.")
-        c.commit()
+        else:
+            c.commit() # Normal schema creation commit
     finally: c.close()
 
 def get_teams():

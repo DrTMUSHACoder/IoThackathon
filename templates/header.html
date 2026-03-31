@@ -26,35 +26,35 @@
     </a>
     
     <!-- RIGHT ALIGNED - ADMIN ACTIONS & THEME -->
-    <div style="display: flex; align-items: center; gap: 16px; justify-self: end;">
+    <div style="display: flex; align-items: center; gap: 8px; justify-self: end;">
         
         {% if session.get('admin_logged_in') %}
             <!-- Contextual Dashboard Tools natively bound if inside Admin -->
             {% if request.endpoint == 'admin' %}
-            <a href="/download_results" class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--primary-neon); color: var(--primary-neon);">
-                📥 Download Results (Excel)
+            <a href="/download_results" class="btn-primary" style="padding: 10px 16px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 243, 255, 0.08); border: 1px solid var(--primary-neon); color: var(--primary-neon); white-space: nowrap; height: 38px; box-sizing: border-box;">
+                📥 Download Excel
             </a>
-            <button onclick="saveScores()" id="saveBtn" class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;">
-                💾 Save Result in Database
+            <button onclick="saveScores()" id="saveBtn" class="btn-primary" style="padding: 10px 16px; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; gap: 8px; height: 38px; box-sizing: border-box; white-space: nowrap;">
+                💾 Save Database
             </button>
             {% endif %}
             
             <!-- Global Logout is universal across all pages if Logged in -->
-            <a href="/logout" class="btn-secondary" style="border-color: var(--error); color: var(--error); padding: 6px 14px; font-size: 0.82rem; text-decoration: none; border-radius: 6px;">
+            <a href="/logout" class="btn-secondary" style="border-color: var(--error); color: var(--error); padding: 10px 16px; font-size: 0.8rem; text-decoration: none; border-radius: 8px; height: 38px; display: flex; align-items: center; box-sizing: border-box;">
                 🚪 Logout
             </a>
             
         {% else %}
         
             <!-- Non-authorized state prompts login context visually -->
-            <a href="/login" class="btn-primary" style="background: var(--surface-dark); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 6px 14px; font-size: 0.82rem; text-decoration: none; border-radius: 6px;">
+            <a href="/login" class="btn-primary" style="background: var(--surface-dark); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 10px 16px; font-size: 0.8rem; text-decoration: none; border-radius: 8px; height: 38px; display: flex; align-items: center; box-sizing: border-box;">
                 🔑 Admin Access
             </a>
             
         {% endif %}
         
-        <!-- Theme logic is universally active inside the DOM state everywhere -->
-        <select id="themeSelector" onchange="changeTheme(this.value)" style="background: rgba(255, 255, 255, 0.05); border: 1.5px solid var(--glass-border); color: var(--text-primary); border-radius: 6px; width: auto; padding: 6px 10px; font-size: 0.8rem; font-weight: 500; cursor: pointer;">
+        <!-- Theme selector with matching height -->
+        <select id="themeSelector" onchange="changeTheme(this.value)" style="background: rgba(255, 255, 255, 0.05); border: 1.5px solid var(--glass-border); color: var(--text-primary); border-radius: 8px; width: auto; padding: 0 12px; font-size: 0.8rem; font-weight: 500; cursor: pointer; height: 38px; box-sizing: border-box;">
             <option value="neon-blue">🔵 Neon Blue</option>
             <option value="cyber-purple">🟣 Cyber Purple</option>
             <option value="matrix-green">🟢 Matrix Green</option>
