@@ -242,6 +242,33 @@ def finalize_registry():
         initialize_db(REGISTRY_PATH)
     return redirect(url_for('admin') + '?registered=1&tab=setup')
 
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
+import io
+
+# ... (Previous code remains the same)
+
+@app.route('/download_results')
+def download_results():
+    if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    teams = get_teams()
+    if not teams: return "No data found."
+    
+    # 📊 Create Excel with Pandas
+    df = pd.DataFrame(teams)
+    
+    # 🧹 Clean up for export
+    cols = ['TeamID', 'ProjectID', 'TeamName', 'ProjectTitle', 'Email', 
+            'R1_Total', 'R2_Total', 'R3P1_Total', 'R3P2_Total', 'R4_Total', 
+            'Weighted_Total', 'Raw_Total']
+    df = df[[c for c in cols if c in df.columns]]
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Hackathon Results')
+    output.seek(0)
+    
+    return send_file(output, as_attachment=True, download_name='iot_hackathon_final_results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
