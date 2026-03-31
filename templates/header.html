@@ -31,6 +31,9 @@
         {% if session.get('admin_logged_in') %}
             <!-- Contextual Dashboard Tools natively bound if inside Admin -->
             {% if request.endpoint == 'admin' %}
+            <a href="/download_results" class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 243, 255, 0.1); border: 1px solid var(--primary-neon); color: var(--primary-neon);">
+                📥 Download Results (Excel)
+            </a>
             <button onclick="saveScores()" id="saveBtn" class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem; border-radius: 6px;">
                 💾 Save Result in Database
             </button>
