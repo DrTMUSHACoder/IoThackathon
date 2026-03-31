@@ -1,1 +1,40 @@
 TeamID,ProjectID,TeamName,ProjectTitle,Email,R1_Innovation,R1_ProblemRelevance,R1_TechFeasibility,R1_ClarityPresentation,R2_FeasibilityValidation,R2_SystemDesignLogic,R2_DemoQuality,R2_TechnicalUnderstanding,R3P1_InitialImplementation,R3P1_ApproachMethodology,R3P1_ProgressLevel,R3P1_TeamCoordination,R3P2_ImprovementPhase1,R3P2_InnovationModification,R3P2_ProblemSolvingApproach,R3P2_StabilityFunctionality,R4_Innovation,R4_WorkingPrototype,R4_RealTimeImpact,R4_PresentationSkills,R4_QAHandling,R1_Total,R2_Total,R3P1_Total,R3P2_Total,R4_Total,Weighted_Total,Raw_Total
+1,PR-IOT-1A-001,M.Akshaya,P1,drtmusha@rcee.ac.in,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,PR-IOT-1A-002,Ammalakanti Amulya ,P2,ushawin2020@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+3,PR-IOT-1A-003,SHILPIKA ANAGANI ,P3,ashariniharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+4,PR-IOT-1A-004,Katta pravallika,P4,anandhunharish@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,PR-IOT-1A-005,Ganisetty Monika krishna ,P5,eswarkumar1164@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+6,PR-IOT-1A-006,Roshini,P6,rafiuddin2915@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+7,PR-IOT-1A-007,Neelagiri sai muneesh ,P7,irfansyed4957@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+8,PR-IOT-1A-008,Priya Darshini,P8,rojlinsaggurthi2006@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+9,PR-IOT-1A-009,P.Sai Subhash,P9,anjaliuppala25@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+10,PR-IOT-1A-010,Aishwarya,P10,hemalathajadagam@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+11,PR-IOT-1A-011,Gariganti Murali Krishna ,P11,zarifshaik67@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+12,PR-IOT-1A-012,Ch ishwarya ,P12,anushakatru4@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+13,PR-IOT-1A-013,K.Gnanamani,P13,ahanthimorla2006@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+14,PR-IOT-1A-014,B.Bhanu Sri Sarayu ,P14,nimmagaddasagar6@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+15,PR-IOT-1A-015,B. Veera naga suresh,P15,vangalapudidevi1229@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+16,PR-IOT-1A-016,Putti Daiva Paul,P16,cnbcharan@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+17,PR-IOT-1A-017,G.Neelima ,P17,chandrashakerm7@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+18,PR-IOT-1A-018,Janga. Donald ,P18,bhuvannagadurgesh1234@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+19,PR-IOT-1A-019,Allu Siva Malleswari ,P19,pakalapatikomal11431@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+20,PR-IOT-1A-020,Gunakala Devi Sowmya ,P20,jaahnaviparavathaneni@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+21,PR-IOT-1A-021,TRIPARNA PRATYUSHA ,P21,abbulavanya9@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+22,PR-IOT-1A-022,Uppala Anjali Sushmitha ,P22,rameelachoudhary3@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+23,PR-IOT-1A-023,Purapu Anusha ,P23,hemamaddala456@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+24,PR-IOT-1A-024,Nalli. Rajeswari,P24,nithiinprakash0324@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+25,PR-IOT-1A-025,K sriya prasanna ,P25,sriyakandhagaddla@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+26,PR-IOT-1A-026,V. Pragna sri valli,P26,rushikukkala@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+27,PR-IOT-1A-027,B.Geetha sri,P27,synalaabhishekpaul@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+28,PR-IOT-1A-028,S Babi,P28,syedaarif4676@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+29,PR-IOT-1A-029,G.Prem Kumar,P29,yallamellideepu@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+30,PR-IOT-1A-030,T. Sunny ,P30,anilkumardongala3@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+31,PR-IOT-1A-031,Saladi Mohan Ganesh ,P31,dhanapujithamuddineni2705@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+32,PR-IOT-1A-032,Manepalli Venkata Siva Sri Harikrishna ,P32,mediboyinayamini123@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+33,PR-IOT-1A-033,Angara Malika,P33,devisowmyagunakala@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+34,PR-IOT-1A-034,Velagala Bindu ,P34,triparnapratyusha@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+35,PR-IOT-1A-035,K.Likhitha Veni,P35,sudheeryetrinchi1111@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+36,PR-IOT-1A-036,Madeti Rani Vara Deepika ,P36,yogithasaisri55@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+37,PR-IOT-1A-037,Balusu Suhasya ,P37,chebathiniahv95@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+38,PR-IOT-1A-038,Ushajyothi ,P38,allusivamalleswari@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+39,PR-IOT-1A-039,SK.Sohel,P39,vinayamandava1@gmail.com,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

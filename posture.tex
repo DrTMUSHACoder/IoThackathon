@@ -1,0 +1,227 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.5cm]{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage[most]{tcolorbox}
+\usepackage{fontawesome5}
+\usepackage{graphicx}
+\usepackage{pagecolor}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% Define Vibrant Colors from Original Image
+\definecolor{primary}{HTML}{003366} % Deep Blue
+\definecolor{secondary}{HTML}{FF6600} % Bright Orange
+\definecolor{accent}{HTML}{0066CC} % Mid Blue
+\definecolor{bglight}{HTML}{F6F4ED} % Enhanced Cream/Beige for background
+\definecolor{boxbg}{HTML}{FFFFFF} % White for nodes
+
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, shadows.blur, patterns}
+
+\begin{document}
+\pagestyle{empty}
+\pagecolor{bglight}
+
+% Background Texture (Subtle parchment-like overlay)
+\begin{tikzpicture}[remember picture, overlay]
+    \node[opacity=0.03, inner sep=0pt] at (current page.center) {
+        \begin{tikzpicture}[pattern=dots, pattern color=primary!20]
+            \fill (current page.south west) rectangle (current page.north east);
+        \end{tikzpicture}
+    };
+\end{tikzpicture}
+
+% Header Section (More faithful to original banner)
+\begin{center}
+    \begin{tcolorbox}[colback=white!95!bglight, colframe=primary!30, arc=15pt, boxrule=1pt, width=0.95\textwidth, enhanced, blur shadow]
+        \centering
+        \begin{minipage}{0.2\textwidth}
+            \centering \includegraphics[height=1.2cm]{college_logo.png} 
+        \end{minipage}
+        \begin{minipage}{0.55\textwidth}
+            \centering
+            {\Huge \bfseries \textcolor{primary}{PRAKALP 2026 -- IoT SPRINT}}\\[5pt]
+            {\Large \bfseries \textcolor{secondary}{24-HOUR HACKATHON ROADMAP} \textcolor{primary}{\footnotesize (APRIL 1st -- 2nd)}}
+        \end{minipage}
+        \begin{minipage}{0.2\textwidth}
+             \centering \includegraphics[height=1.2cm]{college_logo.png} 
+        \end{minipage}
+    \end{center}
+\end{center}
+
+\vspace{-10pt}
+
+\begin{tikzpicture}[remember picture, overlay, shift={(current page.center)}]
+    % Central Timeline Line
+    \draw[primary!40, line width=2pt] (0, 10.5) -- (0, -12);
+    
+    % Node styles
+    \tikzset{
+        iconcircle/.style={
+            circle, minimum size=1.1cm, fill=white, draw=primary, line width=1pt, blur shadow, inner sep=0pt
+        },
+        eventbox/.style={
+            rectangle, rounded corners=12pt, fill=white, draw=gray!20, line width=0.5pt, 
+            text width=4.5cm, inner sep=8pt, blur shadow={shadow opacity=20}
+        },
+        dot/.style={
+            circle, fill=secondary, minimum size=8pt, draw=white, line width=2pt
+        },
+        tag/.style={
+            fill=primary, text=white, font=\bfseries\small, rounded corners=8pt, inner sep=4pt
+        }
+    }
+
+    % DAY 1 Header
+    \node[tag, xshift=-4cm] (day1) at (0, 11) {\faCalendar* \ DAY 1 -- APRIL 1st};
+
+    % --- 8:30 AM: REGISTRATIONS (Full width feel) ---
+    \coordinate (y1) at (0, 9.5);
+    \node[dot] at (y1) {};
+    \node[iconcircle] (i1) at (-6.5, 9.5) {\textcolor{primary}{\faClipboardList[regular]}};
+    \node[eventbox, anchor=west] at (-5.8, 9.5) {
+        \textcolor{primary}{\bfseries 8:30 AM -- 9:15 AM}\\[2pt]
+        {\large \bfseries REGISTRATIONS}
+    };
+    \draw[primary!30, dashed] (i1.east) -- (-0.1, 9.5);
+
+    % --- 10:00 AM: INAUGURATION (LEFT) & ROUND 1 (RIGHT) ---
+    \coordinate (y2) at (0, 7.8);
+    \node[dot] at (y2) {};
+    \node[iconcircle] (i2) at (-6.5, 7.8) {\textcolor{secondary}{\faBullhorn}};
+    \node[eventbox, anchor=west] at (-5.8, 7.8) {
+        \textcolor{primary}{\bfseries 10:00 AM -- 10:30 AM}\\[2pt]
+        {\large \bfseries INAUGURATION \& ORIENTATION}
+    };
+    \draw[primary!30, dashed] (i2.east) -- (-0.1, 7.8);
+    
+    \node[eventbox, anchor=west] at (0.5, 7.8) {
+        \textcolor{secondary}{\bfseries 10:00 AM -- 10:30 AM}\\[2pt]
+        {\large \bfseries ROUND 1: Idea Submission} \\ \small (Judges Evaluation)
+    };
+    \draw[primary!30, dashed] (0.1, 7.8) -- (0.5, 7.8);
+
+    % --- 10:30 AM: ROUND 1 CONTINUATION (LEFT) & LUNCH (RIGHT) ---
+    \coordinate (y3) at (0, 6);
+    \node[dot] at (y3) {};
+    \node[iconcircle] (i3) at (-6.5, 6) {\textcolor{accent}{\faLightbulb}};
+    \node[eventbox, anchor=west] at (-5.8, 6) {
+        \textcolor{primary}{\bfseries 10:30 AM -- 1:30 PM}\\[2pt]
+        {\large \bfseries ROUND 1: Idea Submission} \\ \small (Judges Evaluation)
+    };
+    \draw[primary!30, dashed] (i3.east) -- (-0.1, 6);
+    
+    \node[eventbox, anchor=west] at (0.5, 6) {
+        \textcolor{secondary}{\bfseries 1:30 PM -- 2:15 PM}\\[2pt]
+        {\large \bfseries LUNCH BREAK}
+    };
+    \draw[primary!30, dashed] (0.1, 6) -- (0.5, 6);
+
+    % --- 1:30 PM: LUNCH (LEFT) & ROUND 2 (RIGHT) ---
+    \coordinate (y4) at (0, 4.2);
+    \node[dot] at (y4) {};
+    \node[iconcircle] (i4) at (-6.5, 4.2) {\textcolor{primary}{\faUtensils}};
+    \node[eventbox, anchor=west] at (-5.8, 4.2) {
+        \textcolor{primary}{\bfseries 1:30 PM -- 2:15 PM}\\[2pt]
+        {\large \bfseries LUNCH BREAK}
+    };
+    \draw[primary!30, dashed] (i4.east) -- (-0.1, 4.2);
+    
+    \node[eventbox, anchor=west] at (0.5, 4.2) {
+        \textcolor{secondary}{\bfseries 2:15 PM -- 5:30 PM}\\[2pt]
+        {\large \bfseries ROUND 2: Simulation / Concept Validation}
+    };
+
+    % --- 2:15 PM: ROUND 2 (LEFT) & SNACKS (RIGHT) ---
+    \coordinate (y5) at (0, 2.4);
+    \node[dot] at (y5) {};
+    \node[iconcircle] (i5) at (-6.5, 2.4) {\textcolor{primary}{\faCogs}};
+    \node[eventbox, anchor=west] at (-5.8, 2.4) {
+        \textcolor{primary}{\bfseries 2:15 PM -- 5:30 PM}\\[2pt]
+        {\large \bfseries ROUND 2: Simulation / Concept Validation}
+    };
+    \draw[primary!30, dashed] (i5.east) -- (-0.1, 2.4);
+    
+    \node[eventbox, anchor=west] at (0.5, 2.4) {
+        \textcolor{secondary}{\bfseries 5:30 PM -- 6:00 PM}\\[2pt]
+        {\large \bfseries SNACKS BREAK}
+    };
+
+    % NIGHT SESSION Tag
+    \node[tag, xshift=-4cm] at (0, 0.8) {\faMoon \ NIGHT SESSION};
+
+    % --- NIGHT: ENGAGEMENT (LEFT) & ROUND 3 (RIGHT) ---
+    \coordinate (y6) at (0, -0.8);
+    \node[dot] at (y6) {};
+    \node[iconcircle] (i6) at (-6.5, -0.8) {\textcolor{secondary}{\faGamepad}};
+    \node[eventbox, anchor=west] at (-5.8, -0.8) {
+        \textcolor{primary}{\bfseries 5:30 PM -- 6:00 PM}\\[2pt]
+        {\large \bfseries ENGAGEMENT \& FUN ACTIVITIES}
+    };
+    \draw[primary!30, dashed] (i6.east) -- (-0.1, -0.8);
+    
+    \node[eventbox, anchor=west] at (0.5, -0.8) {
+        \textcolor{secondary}{\bfseries 6:00 PM -- 8:30 PM}\\[2pt]
+        {\large \bfseries ROUND 3: Phase 1}
+    };
+
+    % ROUND 3 Phase 2 and Dinner
+    \coordinate (y7) at (0, -2.5);
+    \node[dot] at (y7) {};
+    \node[eventbox, anchor=west, text width=6cm] at (0.5, -2.5) {
+        \textcolor{secondary}{\bfseries 8:30 PM -- 9:15 PM}\\[2pt]
+        {\large \bfseries DINNER BREAK}
+    };
+
+    % DAY 2 Tag
+    \node[tag, xshift=-4cm] at (0, -4) {\faCalendar \ DAY 2 -- APRIL 2nd};
+
+    % --- DAY 2: SNACKS & SPRINT ---
+    \coordinate (y8) at (0, -5.5);
+    \node[dot] at (y8) {};
+    \node[iconcircle] (i7) at (-6.5, -5.5) {\textcolor{primary}{\faCoffee}};
+    \node[eventbox, anchor=west] at (-5.8, -5.5) {
+        \textcolor{primary}{\bfseries 1:30 AM -- 2:00 AM}\\[2pt]
+        {\large \bfseries MID NIGHT SNACKS BREAK}
+    };
+    \draw[primary!30, dashed] (i7.east) -- (-0.1, -5.5);
+
+    \coordinate (y9) at (0, -7.2);
+    \node[dot] at (y9) {};
+    \node[iconcircle] (i8) at (-6.5, -7.2) {\textcolor{primary}{\faRunning}};
+    \node[eventbox, anchor=west] at (-5.8, -7.2) {
+        \textcolor{primary}{\bfseries 2:00 AM -- 6:00 AM}\\[2pt]
+        {\large \bfseries FINAL DEVELOPMENT SPRINT}
+    };
+    \draw[primary!30, dashed] (i8.east) -- (-0.1, -7.2);
+
+    % --- DAY 2: ROUND 4 & VALEDICTORY ---
+    \coordinate (y10) at (0, -9);
+    \node[dot] at (y10) {};
+    \node[iconcircle] (i9) at (-6.5, -9) {\textcolor{secondary}{\faBroadcastTower}};
+    \node[eventbox, anchor=west] at (0.5, -9) {
+        \textcolor{secondary}{\bfseries 8:00 AM -- 10:00 AM}\\[2pt]
+        {\large \bfseries ROUND 4: FINAL PITCH}
+    };
+    
+    \coordinate (y11) at (0, -10.5);
+    \node[dot] at (y11) {};
+    \node[eventbox, anchor=west, fill=secondary!10] at (0.5, -10.5) {
+        \textcolor{secondary}{\bfseries 10:00 AM -- 10:30 AM}\\[2pt]
+        {\large \bfseries \faTrophy \ VALEDICTORY}
+    };
+
+\end{tikzpicture}
+
+% Bottom Branding
+\begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south, yshift=0.5cm] at (current page.south) {
+        \begin{minipage}{\textwidth}
+            \centering \includegraphics[width=5cm]{college_logo.png}\\[5pt]
+            \textcolor{primary!80}{\faGlobe \ www.rcee.ac.in \quad \faInstagram \ ramachandra\_college \quad \faEnvelope \ info@rcee.ac.in}
+        \end{minipage}
+    };
+\end{tikzpicture}
+
+\end{document}

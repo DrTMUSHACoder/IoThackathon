@@ -3,433 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Hackathon Portal 2026 | High-Density Dashboard</title>
+    <title>🏆 PRAKALP 2026 | IoT Hackathon - Live Leaderboard</title>
+    <meta name="description" content="Live ranking and detailed evaluation of Top 5 teams for PRAKALP 2026 IoT Sprint.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #2980b9;
-            --bg: #f3f6f9;
-            --text: #333;
-            --border: #dcdde1;
-            --highlight: #c0392b;
-            --success: #27ae60;
-        }
-
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: 8px; 
-            height: 100vh;
-            overflow: hidden; 
-        }
-
-        .main-app {
-            max-width: 1100px;
+        .leaderboard-container {
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            height: calc(100vh - 16px);
-            border-radius: 6px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            padding: 12px;
+            padding: 40px 20px;
         }
 
-        header {
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-neon);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        /* ─── Top 5 Cards ─── */
+        .top-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .team-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: var(--glass-blur);
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary-neon);
+            box-shadow: 0 12px 40px color-mix(in srgb, var(--primary-neon) 20%, transparent);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-neon);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px var(--primary-neon);
+        }
+
+        .team-meta h3 { color: var(--primary-neon); font-size: 1.3rem; margin-bottom: 8px; }
+        .team-meta .project-id { color: var(--accent-gold); font-weight: 700; font-size: 0.9rem; }
+        .team-meta .project-title { font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px; line-height: 1.4; }
+
+        .score-display {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--glass-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 6px;
-            margin-bottom: 10px;
-            flex-shrink: 0;
         }
 
-        .logo-area { display: flex; align-items: center; gap: 8px; }
-        .logo-area h1 { margin: 0; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.5px; }
-        .logo-area span { font-size: 1.5rem; }
+        .total-score { font-size: 2.2rem; font-weight: 900; color: var(--primary-neon); }
+        .score-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
 
-        .tab-nav { display: flex; gap: 8px; }
-        .tab-btn {
-            padding: 4px 12px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: 0.2s;
+        /* ─── Detailed Evaluation Table ─── */
+        .detailed-eval-area {
+            background: var(--surface-dark);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 32px;
+            margin-top: 40px;
         }
-        .tab-btn.active { background: var(--accent); color: white; }
-        .tab-btn.inactive { background: #f1f2f6; color: #666; }
 
-        .content-view { flex-grow: 1; overflow: hidden; position: relative; }
-        .tab-pane { 
-            display: none; 
-            height: 100%; 
-            flex-direction: column;
+        .eval-table { width: 100%; border-collapse: collapse; }
+        .eval-table th { 
+            text-align: left; 
+            padding: 15px; 
+            color: var(--text-secondary); 
+            font-size: 0.8rem; 
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--glass-border);
         }
-        .tab-pane.active { display: flex; }
-
-        .table-scroll { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; table-layout: fixed; }
-        th { background: #f8f9fa; color: var(--primary); font-weight: 800; font-size: 0.7rem; padding: 5px 8px; border-bottom: 2px solid #eee; position: sticky; top: 0; z-index: 10; text-align: left; text-transform: uppercase; }
-        td { padding: 5px 8px; border-bottom: 1px solid #f1f1f1; font-size: 0.78rem; vertical-align: middle; line-height: 1.3; }
+        .eval-table td { padding: 18px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
-        th:nth-child(1), td:nth-child(1) { width: 40px; }
-        th:nth-child(3), td:nth-child(3) { width: 100px; text-align: center; }
-        th:nth-child(4), td:nth-child(4) { width: 220px; }
-        
-        .domain-row { background: var(--primary); color: white; font-weight: bold; font-size: 0.8rem; padding: 4px 10px; }
-        .domain-badge { background: rgba(255,255,255,0.2); padding: 1px 6px; border-radius: 10px; font-size: 0.65rem; margin-left:10px; }
+        .round-score {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .round-weight { font-size: 0.7rem; color: var(--text-secondary); opacity: 0.6; display: block; }
 
-        .title-link { color: var(--accent); font-weight: 700; text-decoration: none; cursor: pointer; }
-        .title-link:hover { text-decoration: underline; color: var(--highlight); }
-
-        /* Analytics Tab */
-        .analytics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; height: 100%; overflow-y: auto; padding-bottom: 20px; }
-        .stats-box { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 12px; }
-        .stats-box h4 { margin: 0 0 8px 0; font-size: 0.8rem; color: var(--accent); border-bottom: 1px solid #eee; padding-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .inv-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed #f1f1f1; font-size: 0.75rem; }
-        .count-badge { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: var(--highlight); }
-
-        .procure-health { background: #fff5f5; border: 1.5px solid #ff0000; border-radius: 8px; padding: 12px; grid-column: span 3; margin-bottom: 12px; display: flex; gap: 15px; align-items: center; }
-        .shortage-card { background: white; border: 1px solid #ffcccc; padding: 8px; border-radius: 6px; min-width: 160px; text-align: center; flex-grow: 1; }
-        .shortage-card h5 { margin: 0 0 3px 0; color: #c0392b; font-size: 0.75rem; }
-
-        /* Extended Modal */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 999; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 700px; background: white; border-radius: 12px; box-shadow: 0 30px 90px rgba(0,0,0,0.5); z-index: 1000; padding: 30px; border-left: 10px solid var(--accent); max-height: 85vh; overflow-y: auto; }
-        .modal h2 { color: var(--primary); margin-top: 0; font-size: 1.25rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .modal section { margin-top: 15px; }
-        .modal h4 { color: var(--accent); margin: 15px 0 5px 0; font-size: 0.95rem; text-transform: uppercase; }
-        .modal p { font-size: 0.9rem; line-height: 1.6; color: #444; margin: 0; }
-        .modal ul { font-size: 0.88rem; line-height: 1.6; color: #555; padding-left: 20px; margin-top: 5px; }
-        .hw-tag { display: inline-block; padding: 4px 10px; background: #fff0f0; color: var(--highlight); border-radius: 4px; font-weight: 700; font-size: 0.8rem; margin-top: 20px; border: 1px solid #ffcccc; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        .highlight-row { background: color-mix(in srgb, var(--primary-neon) 5%, transparent); }
     </style>
 </head>
-<body>
+<body data-theme="neon-blue">
 
-    <div id="overlay" class="overlay" onclick="closeDoc()"></div>
-    <div id="modal" class="modal">
-        <h2 id="m-title"></h2>
+    {% include 'header.html' %}
+
+    <div class="leaderboard-container">
         
-        <section>
-            <h4>Problem Statement</h4>
-            <p id="m-prob"></p>
-        </section>
+        <div class="section-title">
+            <h1>🏆 Top 5 Elite Finalists</h1>
+            <p style="color: var(--text-secondary);">Calculated Live based on Normalized Domain Weights (15% | 15% | 20% | 20% | 30%)</p>
+        </div>
 
-        <section>
-            <h4>Technical Objectives & Features</h4>
-            <ul id="m-obj"></ul>
-        </section>
-
-        <div id="m-hw" class="hw-tag"></div><br>
-        
-        <button onclick="closeDoc()" style="margin-top:25px; padding:10px 30px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:0.8rem; letter-spacing:1px; width:100%;">Close Project Profile</button>
-    </div>
-
-    <div class="main-app">
-        <header>
-            <div class="logo-area"><span>📡</span><h1>IoT Hackathon Portal 2026</h1></div>
-            <div class="tab-nav">
-                <button id="btn-p" class="tab-btn active" onclick="switchTab('p')">Project Catalogue</button>
-                <button id="btn-a" class="tab-btn inactive" onclick="switchTab('a')">Resource Analysis</button>
-            </div>
-        </header>
-
-        <div class="content-view">
-            <div id="view-p" class="tab-pane active">
-                <div class="table-scroll">
-                    <table>
-                        <thead>
-                            <tr><th style="width:40px;">S.No</th><th>Project Title (Descriptive)</th><th style="width:100px; text-align:center;">Comp.</th><th style="width:220px;">Hardware Required</th></tr>
-                        </thead>
-                        <tbody id="p-body"></tbody>
-                    </table>
+        <!-- 🏆 TOP 5 CARDS -->
+        <div class="top-cards-grid">
+            {% for team in teams[:5] %}
+            <div class="team-card">
+                <div class="rank-badge">{{ loop.index }}</div>
+                <div class="team-meta">
+                    <span class="project-id">{{ team.ProjectID }}</span>
+                    <h3>{{ team.TeamName }}</h3>
+                    <p class="project-title">{{ team.ProjectTitle }}</p>
                 </div>
-            </div>
-
-            <div id="view-a" class="tab-pane">
-                <div class="procure-health" style="background:#fff; border:2px solid #eee; margin-bottom:15px; padding:15px;">
-                    <h3 style="margin:0 0 10px 0; color:var(--primary); font-size:1.1rem; border-bottom:3px solid var(--accent); display:inline-block;">Final Lab Procurement & Gap Matrix</h3>
-                    <p style="margin:0; font-size:0.8rem; color:#666;">Comparing 45 Project Needs vs. Physical Audit Paper (March 2026)</p>
-                </div>
-
-                <div class="analytics-grid" style="grid-template-columns: 1fr 1fr; gap:20px;">
-                    <div class="stats-box" style="grid-column: span 2;">
-                        <h4 style="background:var(--primary); color:white; padding:8px 12px; border-radius:4px; margin-bottom:0;">Logistics & Inventory Table</h4>
-                        <table style="margin-top:0; border:1px solid #eee;">
-                            <thead style="background:#f8f9fa;">
-                                <tr>
-                                    <th style="width:250px;">Hardware Component (Item)</th>
-                                    <th style="width:120px; text-align:center;">Project Needs</th>
-                                    <th style="width:150px; text-align:center;">Available In-Hand</th>
-                                    <th style="width:180px; text-align:center;">Procurement Need</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>WiFi Modules (ESP8266/NodeMCU)</td><td align="center">20</td><td align="center">00 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +20</td></tr>
-                                <tr><td>IR Senosrs (Detection Matrix)</td><td align="center">18</td><td align="center">06 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +12</td></tr>
-                                <tr><td>Relay modules (Switching)</td><td align="center">16</td><td align="center">07 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +09</td></tr>
-                                <tr><td>DHT-11 (Climate Sensors)</td><td align="center">09</td><td align="center">02 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +07</td></tr>
-                                <tr><td>flain sensors (Fire Safety)</td><td align="center">08</td><td align="center">04 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +04</td></tr>
-                                <tr><td>water motor / Water Pump</td><td align="center">05</td><td align="center">01 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +04</td></tr>
-                                <tr><td>Motor Drives (L298N)</td><td align="center">04</td><td align="center">02 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +02</td></tr>
-                                <tr><td>servomotor (MG995)</td><td align="center">07</td><td align="center">04 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +03</td></tr>
-                                <tr><td>soil moitures (Agriculture)</td><td align="center">05</td><td align="center">02 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +03</td></tr>
-                                <tr><td>Bluetooth (Wireless Hub)</td><td align="center">05</td><td align="center">02 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +03</td></tr>
-                                <tr><td>Dc Fan (Cooling System)</td><td align="center">05</td><td align="center">02 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +03</td></tr>
-                                <tr><td>Ultra sonic Sensors</td><td align="center">10</td><td align="center">08 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +02</td></tr>
-                                <tr><td>Arduino UNO (Main Core)</td><td align="center">39</td><td align="center">36 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +03</td></tr>
-                                <tr><td>Bread board (Layouts)</td><td align="center">45</td><td align="center">20 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +25</td></tr>
-                                <tr><td>9V-Bae with Connectors</td><td align="center">45</td><td align="center">20 Units</td><td align="center" style="color:#ff0000; font-weight:bold;">Need: +25</td></tr>
-                                <tr><td>Buzers (Surplus Stock)</td><td align="center">17</td><td align="center" style="color:var(--success);">29 Units</td><td align="center" style="color:var(--success); font-weight:bold;">AVAILABLE (✅)</td></tr>
-                                <tr><td>Raspberry Pi (High Perf)</td><td align="center">03</td><td align="center" style="color:var(--success);">07 Units</td><td align="center" style="color:var(--success); font-weight:bold;">AVAILABLE (✅)</td></tr>
-                            </tbody>
-                        </table>
+                <div class="score-display">
+                    <div>
+                        <span class="score-label">Final Weighted Total</span>
                     </div>
+                    <div class="total-score">{{ team.Weighted_Total|round(0)|int }}<span style="font-size: 0.9rem; opacity: 0.5;">/100</span></div>
                 </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 📊 DETAILED EVALUATION (ROUND BY ROUND) -->
+        <div class="detailed-eval-area">
+            <h2 style="font-family: 'Outfit', sans-serif; margin-bottom: 24px; color: var(--text-primary);">📊 Detailed Evaluation Breakdown</h2>
+            <div style="overflow-x: auto;">
+                <table class="eval-table">
+                    <thead>
+                        <tr>
+                            <th>Rank & Team</th>
+                            <th style="text-align:center;">Round 1 <span class="round-weight">15%</span></th>
+                            <th style="text-align:center;">Round 2 <span class="round-weight">15%</span></th>
+                            <th style="text-align:center;">Round 3 P1 <span class="round-weight">20%</span></th>
+                            <th style="text-align:center;">Round 3 P2 <span class="round-weight">20%</span></th>
+                            <th style="text-align:center;">Round 4 <span class="round-weight">30%</span></th>
+                            <th style="text-align:center; color: var(--primary-neon);">Grand Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for team in teams[:5] %}
+                        <tr class="{% if loop.index == 1 %}highlight-row{% endif %}">
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span style="font-weight: 800; color: var(--primary-neon);">#{{ loop.index }}</span>
+                                    <div>
+                                        <div style="font-weight: 700;">{{ team.TeamName }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">{{ team.ProjectID }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td align="center" class="round-score">{{ team.R1_Total|int }} <span style="font-size:0.7rem; opacity:0.4;">/50</span></td>
+                            <td align="center" class="round-score">{{ team.R2_Total|int }} <span style="font-size:0.7rem; opacity:0.4;">/50</span></td>
+                            <td align="center" class="round-score">{{ team.R3P1_Total|int }} <span style="font-size:0.7rem; opacity:0.4;">/50</span></td>
+                            <td align="center" class="round-score">{{ team.R3P2_Total|int }} <span style="font-size:0.7rem; opacity:0.4;">/50</span></td>
+                            <td align="center" class="round-score">{{ team.R4_Total|int }} <span style="font-size:0.7rem; opacity:0.4;">/50</span></td>
+                            <td align="center">
+                                <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.25rem; color: var(--primary-neon);">
+                                    {{ team.Weighted_Total|round(0)|int }}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+
     </div>
 
     <script>
-        const DATA = [
-            { d: "🤖 Robotics & Autonomous Systems", n: "5 List" },
-            { id: "01", t: "IoT Based Automated Fire Fighting Robot using Arduino and Flame Sensors", c: 4, h: "Arduino, Flame, Driver, Water Motor", 
-              p: "Industrial fire outbreaks in remote or hazardous areas lead to catastrophic loss if not contained immediately. Manual intervention is often too late or too dangerous for emergency staff.", 
-              o: ["Deliver an autonomous rover for multi-zone flame scanning.","Implement auto-homing logic to steer toward the highest heat signal.","Integrate a water-pump system with relay isolation.","Enable obstacle avoidance using ultrasonic mapping."] },
-            
-            { id: "02", t: "Autonomous Human Following Robot System using Arduino and IR Proximity", c: 4, h: "Arduino, IR Sensors x2, Motor Driver", 
-              p: "Elderly users and lone industrial workers often need heavy tools or lighting to 'shadow' them hands-free without using complex remote controls.", 
-              o: ["Design a target-tracking system using precise IR proximity pairs.","Implement real-time PID acceleration for smooth 'following' patterns.","Enable 360-degree rotational mobility for erratic shifts in movement."] },
-            
-            { id: "03", t: "Smartphone Bluetooth Controlled Robot System for Remote Exploration", c: 4, h: "Arduino, Bluetooth, Motor Driver", 
-              p: "Inspecting hazardous pipe leaks or narrow tunnels requires cheap, wirelessly piloted bots that can be controlled by any standard smartphone.", 
-              o: ["Establish HC-05 Bluetooth pairing with zero-latency command processing.","Map F/B/L/R/Stop packets to L298N motor driver logic.","Log signal strength and uptime for remote stability testing."] },
-            
-            { id: "04", t: "Autonomous Firefront Mapping and Wireless Safety Rover System", c: 4, h: "Arduino, Flame, Ultrasonic, WiFi", 
-              p: "Firefighters lack situational awareness in burning buildings, leading to dangerous entries. A rover can map the fire boundary before humans enter.", 
-              o: ["Build a wall-following crawler with thermal flame sensors.","Transmit localized hazard topography via WiFi/TCP to a tablet hub.","Provide real-time perimeter status updates to incident command."] },
-
-            { id: "05", t: "Smart Blind Spot Radar Integrated Cycle Handle Vibration Alert", c: 3, h: "Arduino, Ultrasonic, Servomotor", 
-              p: "Cyclists are highly vulnerable to rear-end side-swipes by high-speed vehicles entering their blind spots on busy urban roads.", 
-              o: ["Develop a 180-degree rear radar using ultrasonic scanning.","Implement haptic feedback (handle vibrations) using precision servos.","Calibrate alerts based on relative vehicle approach speeds."] },
-
-            { d: "🌾 Smart Agriculture & Irrigation", n: "6 List" },
-            { id: "06", t: "IoT Based Agriculture Monitoring and Soil Analysis System", c: 4, h: "Arduino, Soil Moisture, DHT11, WiFi", 
-              p: "Farmers lack precise field data, leading to either over-irrigation or crop death during dry spells. Scientific moisture tracking is critical.", 
-              o: ["Measure real-time soil moisture vs. ambient humidity levels.","Establish a wireless telemetry hub for daily field reports.","Develop a visual dashboard for moisture trend forecasting."] },
-            
-            { id: "07", t: "IoT Based Automated Crop Irrigation Monitoring and Relay Station", c: 4, h: "Arduino, Soil Moisture, Relay, Pump", 
-              p: "Manual pumping leads to water wastage and uneven crop yield. An automated system can manage water cycles based on root-level needs.", 
-              o: ["Integrate a high-current relay for automated pump isolation.","Implement dry-run protection logic to prevent water motor burnout.","Automate the pump schedule based on moisture percentage thresholds."] },
-            
-            { id: "08", t: "IoT Based Smart Remote Irrigation Monitoring and Control Hub", c: 5, h: "Arduino, Soil, Water Level, Relay, WiFi", 
-              p: "Farmers waste hours visiting remote acreage just to toggle pumps. Total remote control over WiFi can save labor and energy costs.", 
-              o: ["Host a local web-server for global pump toggle via smartphone.","Integrate water level sensors for tank depletion tracking.","Log total daily water consumption (Liters/h proxy)."] },
-            
-            { id: "09", t: "Smart Agriculture Soil Humidity and Nutrient Loop Controller", c: 4, h: "Arduino, Soil, Relay, Water Motor", 
-              p: "Root diseases often occur when soil remains too wet for too long. Maintaining a tight moisture loop is vital for high-yield farming.", 
-              o: ["Implement a closed-loop soil humidity maintenance algorithm.","Automate pump duration based on soil saturation kinetics.","Enable data-over-time logging for nutrient leaching audits."] },
-            
-            { id: "10", t: "Automated Smart Plant Aquaponics Controlling System Hub", c: 4, h: "Arduino, Water Level, Relay, Pump", 
-              p: "Aquaponics systems fail if the water level or oxygenation in fish/plant tanks fluctuates beyond narrow biological limits.", 
-              o: ["Synchronize water circulation between fish and plant beds.","Automate tank refills using level-sensing triggers.","Log water temperature and aeration trends."] },
-            
-            { id: "11", t: "Smart Agricultural Grain Warehouse Heat Map and Aeration", c: 3, h: "Arduino, DHT11, Relay, DC Fan", 
-              p: "Silos destroy tons of cargo each year due to internal 'hotspots' that lead to massive mold growth and fires.", 
-              o: ["Deploy a DHT11 matrix to detect internal thermal pockets.","Automate industrial-grade aeration fans upon humidity spikes.","Provide early-warning alerts for potential grain rot conditions."] },
-
-            { d: "🛡️ Safety, Security & Industrial Monitoring", n: "12 List" },
-            { id: "12", t: "Anti-Theft Security and Sidewalk Navigation Assistive System", c: 3, h: "Arduino, Ultrasonic, Buzzer", 
-              p: "Visually impaired people face twin threats: physical hazards (poles/stairs) and the risk of petty theft in transit zones.", 
-              o: ["Develop an ultrasonic 'Pathfinder' for obstacle detection.","Integrate a proximity-based safe-zone alarm for bags/canes.","Enable multi-tone buzzer feedback for priority alerts."] },
-            
-            { id: "13", t: "IoT Based Industrial Safety Monitoring and Hazard Alerting Hub", c: 4, h: "NodeMCU, IR, Flame, Buzzer", 
-              p: "Factory workers are at high risk in fire or chemical leakage zones. A centralized mesh can warn workers floor-wide.", 
-              o: ["Create a wireless sensor mesh for localized hazard detection.","Push telemetry to an admin dashboard via NodeMCU WiFi.","Implement a floor-wide emergency evacuation alarm."] },
-            
-            { id: "14", t: "IoT Based Gas and Flame Detection Safety Alerting WiFi Hub", c: 4, h: "ESP32, Flame, WiFi, Buzzer, Relay", 
-              p: "Gas leaks in urban apartments can cause massive destruction before the residents even wake up to smell the fumes.", 
-              o: ["Sample high-precision gas and flame signals continuously.","Automate an emergency fuel/power kill-switch via relay.","Send push notifications to the owner's phone via WiFi."] },
-            
-            { id: "15", t: "Synced Multi-Room Fire Evacuation and Emergency Sync Alarm", c: 3, h: "Arduino, Flame, Buzzer, Relay", 
-              p: "In schools or hostels, a fire in the basement often goes ignored on the 4th floor until escape routes are blocked.", 
-              o: ["Build a sync-bus linking multiple alarm triggers.","Activate all building nodes instantly upon a single breach.","Enable visual LED guidance for evacuation routes."] },
-            
-            { id: "16", t: "Home Security Anti-Theft Floor Mat Intrusion Detection", c: 3, h: "Arduino, Ultrasonic, Bluetooth", 
-              p: "Traditional door sensors are easily bypassed by breaking windows. A pressure/proximity mat offers a silent second line of defense.", 
-              o: ["Conceal an ultrasonic sweep matrix beneath floor entry points.","Configure silent Bluetooth alerts to avoid alerting the intruder.","Map intrusion timing and footprint velocity/patterns."] },
-            
-            { id: "17", t: "IV Line Air-Embolism Prevention and Flow Stopper Hub", c: 4, h: "Arduino, IR, Servomotor, Buzzer", 
-              p: "Accidental air infusion (air-embolism) during patient IV therapy is a critical medical risk that can be fatal.", 
-              o: ["Continuously scan IV tubes for air-pocket gaps via IR.","Automate a mechanical servo-clamp to block flow instantly.","Trigger a high-priority nursing station siren."] },
-            
-            { id: "18", t: "Automated Smart Home Bathroom Aerated Occupancy System", c: 4, h: "Arduino, IR, DHT11, Relay, Fan", 
-              p: "Bathroom fans and lights often run in empty cubicles, wasting energy and causing high municipal electricity bills.", 
-              o: ["Implement human presence sensing via IR triangulation.","Automate lighting and ventilation based on occupancy.","Log usage duration for building energy audits."] },
-            
-            { id: "19", t: "Automated Industrial Area Safety and Hazard Lockout Link", c: 3, h: "Arduino, IR Sensor, Relay, Fan", 
-              p: "Robot-assisted manufacturing zones are deadly to humans. Unauthorized entry into the robot's perimeter must stop the machine.", 
-              o: ["Establish an electronic perimeter fence using IR beams.","Implement absolute relay lockout on the primary motor.","Require manual authenticated resets to prevent restarts."] },
-            
-            { id: "20", t: "IoT Based Smart Helmet Access and Safety Enforcement Link", c: 5, h: "Arduino, IR, Bluetooth, Relay, Buzzer", 
-              p: "Riders often carry helmets without wearing them, leading to severe brain injuries during unforeseen accidents.", 
-              o: ["Integrate wearer-presence IR sensors inside the helmet.","Wire-link the helmet to the bike's ignition over Bluetooth.","Block the starter relay if the helmet is not correctly worn."] },
-            
-            { id: "21", t: "IoT Based Air Smoke and Alcohol Detection Alerting Hub", c: 3, h: "Arduino, Flame, DHT11, Buzzer", 
-              p: "High-risk labs require continuous sampling of volatile vapors to ensure OSHA compliance and long-term health for staff.", 
-              o: ["Calibrate smoke and vapor thresholds for lab safety.","Trigger localized sirens and remote logging for breaches.","Analyze air decay rates after ventilation cycles."] },
-            
-            { id: "22", t: "Automated Public Park Bushfire Detection and Alarm Hub", c: 4, h: "Arduino, Flame, Buzzer, WiFi", 
-              p: "Urban park bushfires often start small in dry leaves but can threaten nearby housing if not detected in the first 5 minutes.", 
-              o: ["Deploy flame-sensing 'Sentinels' in dry-foliage zones.","Report the exact GPS/Sector code via WiFi to park ranger.","Enable a central park-wide fire alert siren."] },
-            
-            { id: "23", t: "Autonomous Firefront Mapping and Safety Rover Navigation", c: 4, h: "Arduino, Flame, Ultrasonic, Driver", 
-              p: "During large forest fires, human scouts cannot see the 'fire boundary' due to thick smoke, making containment impossible.", 
-              o: ["Develop a rover that follows the thermal 'edge' of a fire.","Implement obstacle maneuvering for rough forest floor.","Transmit fire expansion rate data to aircraft controllers."] },
-
-            { d: "🏥 Healthcare & Wellness Tracking", n: "4 List" },
-            { id: "24", t: "IoT Based Patient Health Monitoring and Vital Tracking Hub", c: 4, h: "NodeMCU, WiFi Hub, Buzzer", 
-              p: "Overseeing vital signs in overcrowded hospital wards is taxing for nurses, often leading to missed emergency events.", 
-              o: ["Establish a wireless hub for real-time pulse density tracking.","Push data to a central nursing station via WiFi telemetry.","Implement an automated SOS alert for vital drops."] },
-            
-            { id: "25", t: "Heart Disease Prediction using Wearable IoT Sensors and WiFi Link", c: 3, h: "Arduino, IR, WiFi Station", 
-              p: "Cardiac events usually occur after subtle physiological changes that go unnoticed by the patient until it's too late.", 
-              o: ["Develop a pulse-sampling algorithm to detect arrhythmia.","Transmit cardiac risk scores to a WiFi-connected hub.","Warn the patient to seek help prior to full-scale failure."] },
-            
-            { id: "26", t: "EMIT (Emergency Medical Information Tracker): Alert System", c: 4, h: "Arduino, Bluetooth, Buzzer, WiFi", 
-              p: "In vehicle accidents, responders lack the victim's blood group and allergy info, leading to dangerous delayed treatments.", 
-              o: ["Design a compact wearable medical data storage hub.","Broadcast the medical profile over Bluetooth during emergencies.","Trigger a high-decibel local alert for nearby bystanders."] },
-            
-            { id: "27", t: "Heart Disease Detection and Prediction via Wearable Sensors", c: 3, h: "Arduino, Ultrasonic, WiFi, Buzzer", 
-              p: "Sedentary work culture is a leading cause of premature heart disease, as users fail to track their own inactivity level.", 
-              o: ["Track daily inactivity vs. movement using ultrasonic logs.","Analyze heart rate vs. sedentary patterns for health risk.","Push 'Move Now' alerts via buzzer and phone."] },
-
-            { d: "🏢 Infrastructure & Smart City Automation", n: "18 List" },
-            { id: "28", t: "SMART Shopping Card: RFID/Proximity Based Item Billing", c: 3, h: "Arduino, Ultrasonic, WiFi Station", 
-              p: "Queuing at grocery checkouts reduces store throughput and customer satisfaction. Real-time billing can eliminate lines.", 
-              o: ["Detect items entering the cart via proximity sweep.","Update a localized bill onto the user's phone dashboard.","Enable one-tap NFC payment to skip the counter."] },
-            
-            { id: "29", t: "RFICS Toll Gate and Automated Vehicle Clearance Hub", c: 3, h: "Arduino, Ultrasonic, Servomotor", 
-              p: "Manual highway toll booths cause massive traffic jams and fuel wastage. Automated gates increase fleet velocity.", 
-              o: ["Implement ultrasonic vehicle detection for gate automation.","Automate the MG995 servo gate upon payment confirmation.","Log vehicle counts for municipal traffic audits."] },
-            
-            { id: "30", t: "Smart Parking Space Monitoring System using IR WiFi Hub", c: 6, h: "Arduino, 4x IR Sensors, WiFi Hub", 
-              p: "Drivers waste 15+ minutes per day searching for parking, increasing congestion and urban pollution.", 
-              o: ["Monitor 4 parking slots using a mesh of IR sensors.","Broadcast 'Slot Availability' packets to the WiFi cloud.","Deliver a live parking map to incoming commuters."] },
-            
-            { id: "31", t: "Automatic Door Lock/Unlock System using IR Sanitized Sensing", c: 3, h: "Arduino, IR Sensor, Servomotor", 
-              p: "Touching shared door handles in public clinics facilitates the heavy spread of viral infections between patients.", 
-              o: ["Enable touchless gesture-access using IR proximity.","Automate a high-torque servo for heavy door control.","Implement occupancy-based locking for privacy zones."] },
-            
-            { id: "32", t: "IoT Based Weather and Air Quality Monitoring WiFi Station", c: 3, h: "Arduino, DHT11, WiFi, Buzzer", 
-              p: "Standard weather reports don't cover local society-level conditions like humidity and smog in specific blocks.", 
-              o: ["Deploy a society-level weather station for local reports.","Sync logs to ThingSpeak/Cloud for long-term audit.","Trigger smog alerts when air purity drops below safe levels."] },
-            
-            { id: "33", t: "IoT Based Smart Air Quality Purifying and Fan Aeration", c: 4, h: "Arduino, DHT11, DC Fan, Relay", 
-              p: "Confined office air becomes stale with CO2 and dust, causing lethargy and poor cognitive health for employees.", 
-              o: ["Continuously sample indoor humidity and air purity.","Automate aeration fans via relay based on quality thresholds.","Log fan power efficiency and daily runtime."] },
-            
-            { id: "34", t: "Precision Lab Room Temperature and Humidity Control Loop", c: 4, h: "Arduino, DHT11, Relay, Fan", 
-              p: "Pharmaceutical storage requires precision climate loops; even a 2-degree shift can destroy thousands in stock value.", 
-              o: ["Implement a thermostat loop with 1-degree sensitivity.","Enable redundant fan activation via industrial relay.","Notify lab staff over WiFi if a temp breach occurs."] },
-            
-            { id: "35", t: "School Classroom Presence and Power Monitoring WiFi Link", c: 3, h: "Arduino, IR, WiFi Connector", 
-              p: "Schools face high electricity bills due to students leaving fans/lights on in empty classrooms at the end of the day.", 
-              o: ["Deploy a dual-sensor people counter at the doorway.","Automate power cut-off only when count reaches zero.","Log daily classroom usage patterns for building admin."] },
-            
-            { id: "36", t: "Smart Corridor Energy Fan and Climate Controller", c: 4, h: "Arduino, DHT11, IR, Fan, Relay", 
-              p: "Hospital corridors are constantly cooled even when empty for long hours, wasting vital healthcare budget resources.", 
-              o: ["Enable motion-triggered fan activation for hallway zones.","Adjust fan speed dynamically based on room temperature.","Monitor energy savings vs. traditional 24/7 cooling."] },
-            
-            { id: "37", t: "Bus Door Safe Zone Footboard Occupancy Monitor", c: 3, h: "Arduino, Ultrasonic, Buzzer", 
-              p: "Public transport fatalities frequently involve students falling from footboards while traveling in overcrowded buses.", 
-              o: ["Enforce an 'Electronic Safe Zone' curtain on the footboard.","Link the sensor to engine ignition to block movement.","Provide a driver-side siren until the footboard is clear."] },
-            
-            { id: "38", t: "Cycle Blind Spot Warning and Side-Facing Cycle Bell", c: 3, h: "Arduino, Ultrasonic, Buzzer", 
-              p: "Large vehicles often fail to see cycles on their left side during turns, leading to deadly side-swipe accidents.", 
-              o: ["Implement side-looking radar for cycle safety.","Trigger a loud cycle bell automatically upon breach.","Enable visual LEDs for the cyclist's peripheral awareness."] },
-            
-            { id: "39", t: "Wet and Dry Waste Auto-Segregation Bin System", c: 3, h: "Arduino, Soil Moisture, Servomotor", 
-              p: "Manual waste segregation is inconsistent, leading to recycling contamination and environmental pollution.", 
-              o: ["Identify 'Wet' vs 'Dry' waste using moisture induction.","Automate a tilting bin using high-torque servos.","Notify waste management when the bin reaches capacity."] },
-            
-            { id: "40", t: "Smart Refrigerator Energy Saving and Door Open Monitor", c: 4, h: "Arduino, IR, Buzzer, Relay", 
-              p: "Commercial fridges lose massive efficiency when doors are not sealed correctly, wasting expensive food and power.", 
-              o: ["Track door seal status using sensitive magnetic IR.","Trigger a smartphone alarm if left ajar for >30 seconds.","Log daily door cycles for restaurant efficiency audit."] },
-            
-            { id: "41", t: "Vampire Appliance Monitoring and Power Cut-off Relay Hub", c: 4, h: "Arduino, Relay, WiFi", 
-              p: "Appliances in 'Standby' mode waste up to 10% of household energy. A smart hub can identify and cut this standby power.", 
-              o: ["Identify vampire power draw patterns using IoT sensors.","Enable remote power cut-off over the WiFi dashboard.","Calculate total monthly savings generated by the hub."] },
-            
-            { id: "42", t: "Public Transport Tracking and Arrival Notification Station", c: 2, h: "Raspberry Pi, WiFi, Buzzer", 
-              p: "Commuters experience 'uncertainty stress' due to unclear arrival times at bus shelters, leading to inefficient travel.", 
-              o: ["Detect oncoming bus WiFi signatures at shelter hubs.","Provide audio-visual arrival pings for the waiting crowd.","Log daily bus frequency and timing accuracy."] },
-            
-            { id: "43", t: "Bus Student Count Tracking and Overcrowding Alert System", c: 4, h: "Arduino, 2x IR, Buzzer, WiFi", 
-              p: "Overloaded school buses threaten child safety and violate municipal transport laws, leading to vehicle instability.", 
-              o: ["Count children entering the bus using bi-directional IR.","Trigger an occupancy siren once seats are full.","Push student count logs to the school safety office."] },
-            
-            { id: "44", t: "Neighborhood Urban Heat Island Hub using Raspberry Pi", c: 3, h: "Raspberry Pi, DHT11, WiFi", 
-              p: "Densely packed urban blocks trap heat, creating dangerous 'Heat Islands' that generic city weather reports fail to show.", 
-              o: ["Deploy a neighborhood mesh of thermal sensors.","Generate a localized heat-map on a Raspberry Pi host.","Identify critical hot-zones for city greening initiatives."] },
-            
-            { id: "45", t: "Municipal Storage Tank Leakage Prediction WiFi Station", c: 3, h: "Raspberry Pi, Level, WiFi", 
-              p: "Municipal water tanks lose 10-15% of treated water to undetected leaks, causing shortages in residential supply.", 
-              o: ["Monitor tank level kinetics with high-accuracy sensors.","Identify unnatural depletion rates indicative of leaks.","Trigger WiFi repair tickets to municipal engineering."] }
-        ];
-
-        function render() {
-            const body = document.getElementById('p-body');
-            DATA.forEach(item => {
-                if(item.d) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td colspan="4" class="domain-row"><span>${item.d}</span><span class="domain-badge">${item.n}</span></td>`;
-                    body.appendChild(row);
-                } else {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${item.id}</td><td><a class="title-link" onclick="openDoc('${item.id}')">${item.t}</a></td><td class="comp-count">${item.c}</td><td style="color:var(--highlight); font-weight:600; font-size:0.75rem;">${item.h}</td>`;
-                    body.appendChild(row);
-                }
-            });
+        const currTheme = localStorage.getItem('theme') || 'neon-blue';
+        document.body.setAttribute('data-theme', currTheme);
+        
+        function changeTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
-
-        function openDoc(id) {
-            const p = DATA.find(x => x.id === id);
-            document.getElementById('m-title').innerText = `${p.id}: ${p.t}`;
-            document.getElementById('m-prob').innerText = p.p;
-            const objList = document.getElementById('m-obj');
-            objList.innerHTML = "";
-            p.o.forEach(o => {
-                const li = document.createElement('li');
-                li.innerText = o;
-                objList.appendChild(li);
-            });
-            document.getElementById('m-hw').innerText = `Components Required: ${p.h}`;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('modal').style.display = 'block';
-        }
-
-        function closeDoc() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        function switchTab(t) {
-            document.getElementById('view-p').classList.toggle('active', t === 'p');
-            document.getElementById('view-a').classList.toggle('active', t === 'a');
-            document.getElementById('btn-p').className = `tab-btn ${t === 'p' ? 'active' : 'inactive'}`;
-            document.getElementById('btn-a').className = `tab-btn ${t === 'a' ? 'active' : 'inactive'}`;
-        }
-
-        render();
     </script>
+
 </body>
 </html>

@@ -2,6 +2,7 @@ import os
 import smtplib
 import re
 import pandas as pd
+import sqlite3
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from email.message import EmailMessage
@@ -21,11 +22,29 @@ SENDER_PASSWORD = 'bichovbjfzkqypmh'
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'password'
 
+# Create necessary directories
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TMP_DIR = os.path.join(BASE_DIR, 'data', 'tmp')
+os.makedirs(TMP_DIR, exist_ok=True)
+REGISTRY_PATH = os.path.join(TMP_DIR, 'registry.csv')
+
 def get_db_connection():
     url = os.environ.get('POSTGRES_URL') or os.environ.get('STORAGE_URL')
-    if not url: return None
-    try: return psycopg2.connect(url, sslmode='require')
-    except: return None
+    if url:
+        try:
+            return psycopg2.connect(url, sslmode='require')
+        except Exception as e:
+            print(f"❌ Postgres error: {e}")
+            return None
+    else:
+        # 📂 Fallback to local SQLite for development
+        try:
+            conn = sqlite3.connect(os.path.join(BASE_DIR, 'data', 'hackathon.db'))
+            conn.row_factory = sqlite3.Row
+            return conn
+        except Exception as e:
+            print(f"❌ SQLite error: {e}")
+            return None
 
 # ==============================
 # 📊 SCHEMA & METADATA
@@ -51,34 +70,47 @@ def initialize_db(path=None):
     if not c: return
     try:
         cur = c.cursor()
-        cur.execute("""CREATE TABLE IF NOT EXISTS teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
+        schema = """CREATE TABLE IF NOT EXISTS teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
         r1_innovation NUMERIC DEFAULT 0, r1_problemrelevance NUMERIC DEFAULT 0, r1_techfeasibility NUMERIC DEFAULT 0, r1_claritypresentation NUMERIC DEFAULT 0,
         r2_feasibilityvalidation NUMERIC DEFAULT 0, r2_systemdesignlogic NUMERIC DEFAULT 0, r2_demoquality NUMERIC DEFAULT 0, r2_technicalunderstanding NUMERIC DEFAULT 0,
         r3p1_initialimplementation NUMERIC DEFAULT 0, r3p1_approachmethodology NUMERIC DEFAULT 0, r3p1_progresslevel NUMERIC DEFAULT 0, r3p1_teamcoordination NUMERIC DEFAULT 0,
         r3p2_improvementphase1 NUMERIC DEFAULT 0, r3p2_innovationmodification NUMERIC DEFAULT 0, r3p2_problemsolvingapproach NUMERIC DEFAULT 0, r3p2_stabilityfunctionality NUMERIC DEFAULT 0,
-        r4_innovation NUMERIC DEFAULT 0, r4_workingprototype NUMERIC DEFAULT 0, r4_realtimeimpact NUMERIC DEFAULT 0, r4_presentationskills NUMERIC DEFAULT 0, r4_qahandling NUMERIC DEFAULT 0);""")
+        r4_innovation NUMERIC DEFAULT 0, r4_workingprototype NUMERIC DEFAULT 0, r4_realtimeimpact NUMERIC DEFAULT 0, r4_presentationskills NUMERIC DEFAULT 0, r4_qahandling NUMERIC DEFAULT 0);"""
+        cur.execute(schema)
+        
         if path:
+            print(f"📂 Initializing from: {path}")
             cur.execute("DELETE FROM teams;")
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if path.endswith('.csv') else pd.read_excel(path)
-            df.columns = [str(x).strip() for x in df.columns]
+            df.columns = [str(col).strip() for col in df.columns]
+            
             for r in df.to_dict(orient='records'):
-                # ✨ ULTRA-FUZZY KEYWORD FINDER
-                def f(ks):
-                    ks = [str(x).lower().strip() for x in ks]
+                def f(ks, exclude=None):
+                    ks = [k.lower() for k in ks]
                     for rk in r.keys():
                         rk_clean = str(rk).lower().strip()
-                        if any(k in rk_clean for k in ks): return r[rk]
+                        if exclude and any(ex.lower() in rk_clean for ex in exclude): continue
+                        if any(k in rk_clean for k in ks): return str(r[rk]).strip()
                     return ""
                 
-                email = str(f(['Email', 'Mail', 'Id'])).strip()
+                email = f(['Email', 'Mail', 'Id'], exclude=['@']) # exclude columns that aren't the email itself
+                if "@" not in email: # try harder finding it in any field
+                    for val in r.values():
+                        if isinstance(val, str) and "@" in val:
+                            email = val.strip()
+                            break
+                
                 if "@" in email:
-                    tid = str(f(['No', 'TeamID', 'ID'])).strip() or "0"
-                    pid = str(f(['Batch', 'ProjectID', 'PID'])).strip() or "PR-IOT"
-                    name = str(f(['Name', 'Student', 'Team'])).strip() or "Anonymous Team"
-                    title = str(f(['Title', 'Problem', 'Statement'])).strip() or "Untitled Project"
+                    tid = f(['Batch', 'TeamID', 'ProjectID']) or f(['No', 'ID']) or "0"
+                    pid = f(['Batch', 'ProjectID', 'PID']) or "PR-IOT"
+                    name = f(['Name', 'Student', 'Team']) or "Anonymous Team"
+                    title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
                     
-                    cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;",
-                                (tid, pid, name, title, email))
+                    if isinstance(c, sqlite3.Connection):
+                        cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
+                    else:
+                        cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
+            print("✅ Import finished.")
         c.commit()
     finally: c.close()
 
@@ -86,26 +118,32 @@ def get_teams():
     c = get_db_connection()
     if not c: return []
     try:
-        cur = c.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM teams;")
-        raw = cur.fetchall()
-        res = []
-        for r in raw:
-            t = dict(r)
-            # 🔄 REMAP for Dashboard Compatibility
-            t['TeamID'], t['ProjectID'], t['TeamName'], t['ProjectTitle'], t['Email'] = t['teamid'], t['projectid'], t['teamname'], t['projecttitle'], t['email']
-            for k, v in t.items():
-                if k.startswith('r'): t[k] = float(v or 0)
-            def s(fs): return sum(float(t.get(f, 0)) for f in fs)
+        if isinstance(c, sqlite3.Connection):
+            raw = c.execute("SELECT * FROM teams;").fetchall()
+            res = [dict(r) for r in raw]
+        else:
+            cur = c.cursor(cursor_factory=RealDictCursor)
+            cur.execute("SELECT * FROM teams;")
+            res = [dict(r) for r in cur.fetchall()]
+        
+        for t in res:
+            # Consistent mapping
+            t['TeamID'], t['ProjectID'], t['TeamName'], t['ProjectTitle'], t['Email'] = t.get('teamid'), t.get('projectid'), t.get('teamname'), t.get('projecttitle'), t.get('email')
+            for k in list(t.keys()):
+                if k.startswith('r'): t[k] = float(t.get(k) or 0)
+            
+            def s(fs): return sum(float(t.get(f) or 0) for f in fs)
             t['R1_Total'], t['R2_Total'], t['R3P1_Total'], t['R3P2_Total'], t['R4_Total'] = s(SCORING_FIELDS['R1']), s(SCORING_FIELDS['R2']), s(SCORING_FIELDS['R3P1']), s(SCORING_FIELDS['R3P2']), s(SCORING_FIELDS['R4'])
+            # 🏆 Final Combined Score
             t['Weighted_Total'] = (t['R1_Total']*0.3) + (t['R2_Total']*0.3) + (t['R3P1_Total']*0.4) + (t['R3P2_Total']*0.4) + (t['R4_Total']*0.6)
-            res.append(t)
-        return sorted(res, key=lambda x: x['Weighted_Total'], reverse=True)
-    except:
+            t['Raw_Total'] = t['R1_Total'] + t['R2_Total'] + t['R3P1_Total'] + t['R3P2_Total'] + t['R4_Total']
+
+        return sorted(res, key=lambda x: x.get('Weighted_Total', 0), reverse=True)
+    except Exception as e:
+        print(f"❌ Error in get_teams: {e}")
         initialize_db()
         return []
-    finally:
-        if c: c.close()
+    finally: c.close()
 
 # ==============================
 # 📧 ENGINE & ROUTES
@@ -150,8 +188,12 @@ def update_scores():
             for fs in SCORING_FIELDS.values():
                 for f in fs:
                     if f"{f}_{sno}" in fd:
-                        up.append(f"{f} = %s"); pa.append(float(fd[f"{f}_{sno}"] or 0))
-            if up: pa.append(sno); cur.execute(f"UPDATE teams SET {', '.join(up)} WHERE teamid = %s", pa)
+                        up.append(f"{f} = %s" if not isinstance(c, sqlite3.Connection) else f"{f} = ?")
+                        pa.append(float(fd[f"{f}_{sno}"] or 0))
+            if up:
+                pa.append(sno)
+                query = f"UPDATE teams SET {', '.join(up)} WHERE teamid = %s" if not isinstance(c, sqlite3.Connection) else f"UPDATE teams SET {', '.join(up)} WHERE teamid = ?"
+                cur.execute(query, pa)
         c.commit()
     finally: c.close()
     return redirect(url_for('admin') + '?saved=1')
@@ -161,52 +203,37 @@ def upload_dispatch():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     file = request.files.get('registry_file')
     if not file: return redirect(url_for('admin'))
-    p = os.path.join('/tmp', 'registry.csv')
-    file.save(p)
-    df = pd.read_csv(p, sep=None, engine='python', encoding_errors='ignore')
-    rows = df.to_dict(orient='records')
-    sent = 0
-    sent_emails = set()
-    for r in rows:
-        def f(ks):
-            for k in ks:
-                for rk in r.keys():
-                    if k.lower() in rk.lower(): return r[rk]
-            return ""
-        e = str(f(['Email', 'Mail'])).strip().lower()
-        if "@" in e and e not in sent_emails:
-            n, pid, title = f(['Name', 'Student', 'Team']), f(['Project', 'Batch', 'PID']), f(['Title', 'Problem', 'Statement'])
-            body = f"""Dear Student {n},
-
-Greetings from PRAKALP IoT Hackathon Team!
-
-We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP IoT Hackathon.
-
-Hackathon Project ID: {pid}
-Problem Statement: "{title}"
-
-You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
-
-Official WhatsApp Group:
-https://chat.whatsapp.com/Bvo5QC2xRrgA1TODMPx7L0?mode=gi_t
-All participants must join the group for further updates and communication.
-
-If you have any queries, please contact the organizing team.
-
-Wishing you all the best for your hackathon journey!
-
-Regards,
-PRAKALP IoT Admin Team"""
-            send_email(e, f"PRAKALP Assignment: {pid}", body)
-            sent_emails.add(e)
-            sent += 1
-    return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
+    file.save(REGISTRY_PATH)
+    
+    # 📧 Background Broadcast Simulation
+    try:
+        df = pd.read_csv(REGISTRY_PATH, sep=None, engine='python', encoding_errors='ignore') if REGISTRY_PATH.endswith('.csv') else pd.read_excel(REGISTRY_PATH)
+        rows = df.to_dict(orient='records')
+        sent = 0
+        sent_emails = set()
+        for r in rows:
+            def f(ks):
+                for k in ks:
+                    for rk in r.keys():
+                        if k.lower() in str(rk).lower(): return str(r[rk]).strip()
+                return ""
+            e = f(['Email', 'Mail']).lower()
+            if "@" in e and e not in sent_emails:
+                n, pid, title = f(['Name', 'Student', 'Team']), f(['Batch', 'Project', 'PID']), f(['Title', 'Problem', 'Statement'])
+                body = f"Dear {n},\n\nYour IoT Hackathon Project ID is: {pid}\nTopic: {title}\n\nGood luck!"
+                send_email(e, f"PRAKALP Assignment: {pid}", body)
+                sent_emails.add(e)
+                sent += 1
+        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
+    except Exception as e:
+        print(f"❌ Dispatch error: {e}")
+        return redirect(url_for('admin') + f'?error=dispatch_failed&tab=setup')
 
 @app.route('/finalize_registry', methods=['POST'])
 def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    p = os.path.join('/tmp', 'registry.csv')
-    if os.path.exists(p): initialize_db(p)
+    if os.path.exists(REGISTRY_PATH):
+        initialize_db(REGISTRY_PATH)
     return redirect(url_for('admin') + '?registered=1&tab=setup')
 
 @app.route('/reset_db', methods=['POST'])

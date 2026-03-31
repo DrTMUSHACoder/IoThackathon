@@ -441,7 +441,10 @@
                     <h3>{{ rmeta.title }}</h3>
                     <p>🕐 {{ rmeta.desc }}</p>
                 </div>
-                <div class="round-weight-badge">{{ rmeta.weight }}</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Weightage of Round:</span>
+                    <div class="round-weight-badge" style="margin:0;">{{ rmeta.weight }}</div>
+                </div>
             </div>
 
             <!-- Scoring Table -->
@@ -489,11 +492,10 @@
                                 type="number"
                                 id="inp-{{ c.field }}-{{ sno }}"
                                 name="{{ c.field }}_{{ sno }}"
-                                value="{{ team[c.field]|default(0) }}"
+                                value="{{ team[c.field]|default(0)|int }}"
                                 class="criteria-input"
                                 min="0"
                                 max="{{ c.max }}"
-                                step="0.5"
                                 data-max="{{ c.max }}"
                                 data-round="{{ rkey }}"
                                 data-team="{{ sno }}"
@@ -505,13 +507,13 @@
                         <!-- Live Row Total -->
                         <td class="round-total-cell">
                             <span class="round-total-display" id="total-{{ rkey }}-{{ sno }}">
-                                {{ team[rkey ~ '_Total']|default(0)|float|round(1) }}
+                                {{ team[rkey ~ '_Total']|default(0)|int }}
                             </span>
                         </td>
                         <!-- Live Cumulative Total -->
                         <td style="text-align:center; vertical-align:middle; background: color-mix(in srgb, var(--accent-gold) 5%, transparent); border-left: 1px solid var(--glass-border);">
                             <span class="cum-{{ sno }}" style="font-weight: 800; color: var(--accent-gold); font-size: 1.15rem;">
-                                {{ team.Raw_Total|default(0)|float|round(1) }}
+                                {{ team.Raw_Total|default(0)|int }}
                             </span>
                         </td>
                     </tr>
@@ -617,8 +619,10 @@
                 let val = parseFloat(inp.value) || 0;
 
                 if (val > c.max) {
+                    alert(`⚠️ Invalid Score: The maximum allowed for ${c.field.replace('r','Round ').replace('_',' ')} is ${c.max}.`);
+                    inp.value = c.max;
+                    val = c.max;
                     inp.classList.add('over-limit');
-                    hasOverLimit = true;
                 } else {
                     inp.classList.remove('over-limit');
                 }
@@ -627,7 +631,7 @@
 
             const display = document.getElementById(`total-${rkey}-${sno}`);
             if (display) {
-                display.textContent = total % 1 === 0 ? total : total.toFixed(1);
+                display.textContent = Math.round(total);
                 display.classList.toggle('over', total > 50);
             }
 
@@ -643,7 +647,7 @@
                 overallTotal += Math.min(val, max);
             });
             document.querySelectorAll(`.cum-${sno}`).forEach(el => {
-                el.textContent = overallTotal % 1 === 0 ? overallTotal : overallTotal.toFixed(1);
+                el.textContent = Math.round(overallTotal);
             });
         }
 
