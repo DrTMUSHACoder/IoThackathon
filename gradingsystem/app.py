@@ -221,7 +221,12 @@ def admin():
         'round3p2': ('Round 3 P2', 'R3P2_Grade'),
         'round4': ('Round 4', 'R4_Grade')
     }
-    return render_template('admin.html', teams=get_teams(), rounds=round_info, grades=['A+', 'A', 'B+', 'B', 'C'])
+    
+    # Sort strictly by Team ID ascending for consistent judge input
+    t_list = get_teams()
+    t_list.sort(key=lambda x: (len(str(x.get('TeamID', ''))), str(x.get('TeamID', ''))))
+    
+    return render_template('admin.html', teams=t_list, rounds=round_info, grades=['A+', 'A', 'B+', 'B', 'C'])
 
 @app.route('/update_scores', methods=['POST'])
 def update_scores():
