@@ -230,7 +230,7 @@ def update_scores():
             for rnd in ROUNDS:
                 field_key = f"{rnd}_{sno}"
                 if field_key in fd:
-                    up.append(f"{rnd} = ?")
+                    up.append(f"{rnd} = ?" if isinstance(c, sqlite3.Connection) else f"{rnd} = %s")
                     pa.append(fd[field_key].strip().upper())
             if up:
                 pa.append(sno)

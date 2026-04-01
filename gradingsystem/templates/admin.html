@@ -458,7 +458,7 @@
 
                         {% for round_key, (round_title, db_key) in rounds.items() %}
                         <td style="text-align:center;">
-                            <select name="{{ round_key }}_{{ sno }}" class="criteria-input" style="width: auto; padding: 8px 12px; background: #111418; border-color: var(--glass-border); font-size: 1rem;">
+                            <select name="{{ round_key }}_{{ sno }}" onchange="recalcRow('{{ sno }}')" class="criteria-input" style="width: auto; padding: 8px 12px; background: #111418; border-color: var(--glass-border); font-size: 1rem;">
                                 <option value="">-</option>
                                 {% for g in grades %}
                                 <option value="{{ g }}" {% if team[db_key] == g %}selected{% endif %}>{{ g }}</option>
@@ -469,7 +469,7 @@
 
                         <!-- Live Cumulative Total (Pre-calculated from DB) -->
                         <td style="text-align:center; vertical-align:middle; background: color-mix(in srgb, var(--accent-gold) 5%, transparent); border-left: 1px solid var(--glass-border);">
-                            <span style="font-weight: 800; color: var(--accent-gold); font-size: 1.15rem;">
+                            <span id="total_{{ sno }}" style="font-weight: 800; color: var(--accent-gold); font-size: 1.15rem;">
                                 {{ "%.1f"|format(team.Weighted_Total|float) }}%
                             </span>
                         </td>
@@ -499,6 +499,17 @@
     <div class="save-toast" id="saveToast">✅ Grades saved successfully!</div>
 
     <script>
+        const GRADE_MAP = {'A+': 100, 'A': 90, 'B+': 80, 'B': 70, 'C': 60, '': 0};
+        function recalcRow(sno) { // Live percentage update
+            let r1 = document.querySelector(`select[name="round1_${sno}"]`).value;
+            let r2 = document.querySelector(`select[name="round2_${sno}"]`).value;
+            let r3p1 = document.querySelector(`select[name="round3p1_${sno}"]`).value;
+            let r3p2 = document.querySelector(`select[name="round3p2_${sno}"]`).value;
+            let r4 = document.querySelector(`select[name="round4_${sno}"]`).value;
+            let t = (GRADE_MAP[r1]||0)*0.15 + (GRADE_MAP[r2]||0)*0.15 + (GRADE_MAP[r3p1]||0)*0.20 + (GRADE_MAP[r3p2]||0)*0.20 + (GRADE_MAP[r4]||0)*0.30;
+            document.getElementById(`total_${sno}`).textContent = t.toFixed(1) + '%';
+        }
+
         // ─── Save & Sync ───
         async function saveScores() {
             const btn = document.getElementById('saveBtn');
