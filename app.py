@@ -73,7 +73,7 @@ SCORING_META = {
     'R4': {'title': 'Round 4 – Final Pitch', 'desc': 'Live Demo & Q&A', 'weight': '30%', 'criteria': [{'field': 'r4_innovation', 'label': 'Innovation', 'max': 10}, {'field': 'r4_workingprototype', 'label': 'Working Prototype', 'max': 15}, {'field': 'r4_realtimeimpact', 'label': 'Real-Time Impact', 'max': 10}, {'field': 'r4_presentationskills', 'label': 'Presentation Skills', 'max': 5}, {'field': 'r4_qahandling', 'label': 'Q&A Handling', 'max': 10}]}
 }
 
-def initialize_db(path=None):
+def initialize_db(path=None, wipe=False):
     c = get_db_connection()
     if not c: return
     try:
@@ -86,11 +86,13 @@ def initialize_db(path=None):
         r4_innovation NUMERIC DEFAULT 0, r4_workingprototype NUMERIC DEFAULT 0, r4_realtimeimpact NUMERIC DEFAULT 0, r4_presentationskills NUMERIC DEFAULT 0, r4_qahandling NUMERIC DEFAULT 0);"""
         cur.execute(schema)
         
+        if wipe or path:
+            print(f"🗑️ Wiping teams table...")
+            cur.execute("DELETE FROM teams;")
+            c.commit() 
+            
         if path:
             print(f"📂 Initializing from: {path}")
-            cur.execute("DELETE FROM teams;")
-            c.commit() # 🔥 Immediate commit of the wipe
-            
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if str(path).lower().endswith('.csv') else pd.read_excel(path)
             df.columns = [str(col).strip() for col in df.columns]
             
@@ -429,7 +431,7 @@ def download_results():
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    initialize_db()
+    initialize_db(wipe=True)
     return redirect(url_for('admin') + '?reset=1&tab=setup')
 
 if __name__ == '__main__':
