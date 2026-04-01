@@ -766,25 +766,23 @@
         function closePopup() {
             document.getElementById('successPopup').classList.remove('show');
         }
-    </script>
 
         // ─── Show toast on redirect-back (via URL param) ───
-        const params = new URLSearchParams(window.location.search);
-        const toast = document.getElementById('saveToast');
-        if (params.get('saved') === '1') {
-            toast.textContent = '✅ Scores mathematically locked successfully!';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
-        } else if (params.get('registered') === '1') {
-            toast.textContent = '✅ Database successfully populated with Registry!';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
-        } else if (params.get('emailed') === '1') {
-            toast.textContent = '📧 Startup Project ID emails securely dispatched!';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
+        const urlParams = new URLSearchParams(window.location.search);
+        const toastEl = document.getElementById('saveToast');
+        if (urlParams.get('saved') === '1') {
+            toastEl.textContent = '✅ Scores mathematically locked successfully!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
+        } else if (urlParams.get('registered') === '1') {
+            toastEl.textContent = '✅ Database successfully populated with Registry!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
+        } else if (urlParams.get('emailed') === '1') {
+            toastEl.textContent = '📧 Startup Project ID emails securely dispatched!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
         }
     </script>
-
 </body>
 </html>
