@@ -235,7 +235,23 @@ def upload_dispatch():
             e = f(['Email', 'Mail']).lower()
             if "@" in e and e not in sent_emails:
                 n, pid, title = f(['Name', 'Student', 'Team']), f(['Batch', 'Project', 'PID']), f(['Title', 'Problem', 'Statement'])
-                body = f"Dear {n},\n\nYour IoT Hackathon Project ID is: {pid}\nTopic: {title}\n\nGood luck!"
+                body = f"""Dear Student, 
+
+Greetings from PRAKALP Hackathon Team!
+
+We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP Hackathon.
+
+Hackathon Project ID: {pid}
+Problem Statement: {title}
+
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your Hackathon Journey!
+
+Regards,
+PRAKALP Admin Team"""
                 send_email(e, f"PRAKALP Assignment: {pid}", body)
                 sent_emails.add(e)
                 sent += 1
