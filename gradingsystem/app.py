@@ -37,14 +37,22 @@ else:
 REGISTRY_PATH = os.path.join(TMP_DIR, 'registry.csv')
 
 def get_db_connection():
-    # Since this is a parallel system, use local SQLite strictly inside the gradingsystem folder
-    try:
-        conn = sqlite3.connect(os.path.join(BASE_DIR, 'data', 'gradingsystem.db'))
-        conn.row_factory = sqlite3.Row
-        return conn
-    except Exception as e:
-        print(f"❌ SQLite error: {e}")
-        return None
+    url = os.environ.get('POSTGRES_URL') or os.environ.get('STORAGE_URL')
+    if url:
+        try:
+            return psycopg2.connect(url, sslmode='require')
+        except Exception as e:
+            print(f"❌ Postgres error: {e}")
+            return None
+    else:
+        # Fallback to local SQLite for development
+        try:
+            conn = sqlite3.connect(os.path.join(BASE_DIR, 'data', 'gradingsystem.db'))
+            conn.row_factory = sqlite3.Row
+            return conn
+        except Exception as e:
+            print(f"❌ SQLite error: {e}")
+            return None
 
 # ==============================
 # 📊 SCHEMA & METADATA
@@ -66,13 +74,13 @@ def initialize_db(path=None, wipe=False):
     if not c: return
     try:
         cur = c.cursor()
-        schema = """CREATE TABLE IF NOT EXISTS teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
+        schema = """CREATE TABLE IF NOT EXISTS grades_teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
         round1 TEXT DEFAULT '', round2 TEXT DEFAULT '', round3p1 TEXT DEFAULT '', round3p2 TEXT DEFAULT '', round4 TEXT DEFAULT '');"""
         cur.execute(schema)
         
         if wipe or path:
             print("Wiping teams table...")
-            cur.execute("DELETE FROM teams;")
+            cur.execute("DELETE FROM grades_teams;")
             c.commit() 
             
         if path:
@@ -109,9 +117,9 @@ def initialize_db(path=None, wipe=False):
                     title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
                         
                     if isinstance(c, sqlite3.Connection):
-                        cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
+                        cur.execute("INSERT OR REPLACE INTO grades_teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
                     else:
-                        cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
+                        cur.execute("INSERT INTO grades_teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
                 except Exception as row_err:
                     print(f"⚠️ Row error: {row_err}")
                     continue
@@ -127,11 +135,11 @@ def get_teams():
     if not c: return []
     try:
         if isinstance(c, sqlite3.Connection):
-            raw = c.execute("SELECT * FROM teams;").fetchall()
+            raw = c.execute("SELECT * FROM grades_teams;").fetchall()
             res = [dict(r) for r in raw]
         else:
             cur = c.cursor(cursor_factory=RealDictCursor)
-            cur.execute("SELECT * FROM teams;")
+            cur.execute("SELECT * FROM grades_teams;")
             res = [dict(r) for r in cur.fetchall()]
         
         for t in res:
@@ -227,7 +235,7 @@ def update_scores():
                     pa.append(fd[field_key].strip().upper())
             if up:
                 pa.append(sno)
-                query = f"UPDATE teams SET {', '.join(up)} WHERE teamid = ?"
+                query = f"UPDATE grades_teams SET {', '.join(up)} WHERE teamid = ?" if isinstance(c, sqlite3.Connection) else f"UPDATE grades_teams SET {', '.join(up)} WHERE teamid = %s"
                 cur.execute(query, pa)
         c.commit()
     finally: c.close()
