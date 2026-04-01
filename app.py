@@ -234,11 +234,22 @@ def upload_dispatch():
                 return ""
             
             e = f(['Email', 'Mail']).lower()
-            if EMAIL_REGEX.match(e) and e not in sent_emails:
-                n = f(['Name', 'Student', 'Team'])
-                pid = f(['Batch', 'Project', 'PID'])
-                title = f(['Title', 'Problem', 'Statement'])
-                
+            n = f(['Name', 'Student', 'Team', 'Member'])
+            pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial'])
+            title = f(['Title', 'Problem', 'Statement', 'Topic'])
+            
+            if not e:
+                 failed_list.append({'name': n or "Unknown Team", 'email': "MISSING", 'reason': "No email address found in CSV row."})
+                 continue
+                 
+            if e in sent_emails: 
+                 continue
+
+            if not pid or not title:
+                 failed_list.append({'name': n, 'email': e, 'reason': f"Missing Project ID ('{pid}') or Statement ('{title}'). Check CSV headers."})
+                 continue
+
+            if EMAIL_REGEX.match(e):
                 body = f"""Dear Student, 
 Greetings from PRAKALP Hackathon Team!
 
@@ -257,7 +268,9 @@ PRAKALP Admin Team"""
                     sent_emails.add(e)
                     sent += 1
                 else:
-                    failed_list.append({'name': n, 'email': e, 'reason': err})
+                    failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Error: {err}"})
+            else:
+                failed_list.append({'name': n, 'email': e, 'reason': "Invalid email format (check for spaces/special chars)."})
         
         session['failed_emails'] = failed_list
         return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&tab=setup')
