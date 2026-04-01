@@ -609,43 +609,89 @@
             {% endfor %}
         };
 
-        // ─── Switch active round panel ───
+        // ─── Refactored saveScores to use FETCH for async background sync ───
+        let saveTimeout;
+        async function saveScores(isAuto = false) {
+            const btn = document.getElementById('saveBtn');
+            const toast = document.getElementById('saveToast');
+            
+            if (!isAuto) {
+                btn.textContent = '⏳ Manual Sync...';
+                btn.disabled = true;
+            }
+
+            // Check for over-limit inputs before saving
+            const overLimitInputs = document.querySelectorAll('.criteria-input.over-limit');
+            if (overLimitInputs.length > 0) {
+                if (!isAuto) {
+                    alert(`⚠️ ${overLimitInputs.length} field(s) exceed maximum marks. Correct before saving.`);
+                    btn.textContent = '💾 Always Save in Database';
+                    btn.disabled = false;
+                }
+                return;
+            }
+
+            try {
+                const formData = new FormData(document.getElementById('scoringForm'));
+                const response = await fetch('/update_scores', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    toast.textContent = isAuto ? '🔄 Auto-Sync Complete (Live)' : '✅ Database Mathematically Locked!';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), isAuto ? 1500 : 3000);
+                }
+            } catch (err) {
+                console.error('❌ Sync Error:', err);
+            } finally {
+                if (!isAuto) {
+                    btn.textContent = '💾 Always Save in Database';
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // Debounced save for live input
+        function debouncedSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => saveScores(true), 2500); 
+        }
+
+        // ─── Switch active round panel (Now triggers immediate save) ───
         function switchRound(rkey) {
+            saveScores(true);
             document.querySelectorAll('.round-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.round-panel').forEach(p => p.classList.remove('active'));
             document.getElementById('tab-' + rkey).classList.add('active');
             document.getElementById('panel-' + rkey).classList.add('active');
+            const url = new URL(window.location);
+            url.searchParams.set('tab', rkey);
+            window.history.replaceState({}, '', url);
         }
 
-        // ─── Recalculate live row total for a team in a round ───
         function updateRowTotal(rkey, sno) {
             const criteria = CRITERIA[rkey];
             let total = 0;
-            let hasOverLimit = false;
-
             criteria.forEach(c => {
                 const inp = document.getElementById(`inp-${c.field}-${sno}`);
                 if (!inp) return;
                 let val = parseFloat(inp.value) || 0;
-
                 if (val > c.max) {
-                    alert(`⚠️ Invalid Score: The maximum allowed for ${c.field.replace('r','Round ').replace('_',' ')} is ${c.max}.`);
+                    alert(`⚠️ Invalid Score: Max for ${c.field.replace('r','Round ').replace('_',' ')} is ${c.max}.`);
                     inp.value = c.max;
                     val = c.max;
                     inp.classList.add('over-limit');
                 } else {
                     inp.classList.remove('over-limit');
                 }
-                total += Math.min(val, c.max); // cap for display
+                total += Math.min(val, c.max);
             });
-
             const display = document.getElementById(`total-${rkey}-${sno}`);
             if (display) {
                 display.textContent = Math.round(total);
-                display.classList.toggle('over', total > 50);
             }
-
-            // Sync overall system cumulative score
             updateCumulative(sno);
         }
 
@@ -666,47 +712,37 @@
             localStorage.setItem('theme', theme);
         }
 
-        // ─── Initialize all live totals on page load ───
         document.addEventListener('DOMContentLoaded', () => {
-            // Check for tab persistence
+             document.querySelectorAll('.criteria-input').forEach(inp => {
+                inp.addEventListener('blur', () => saveScores(true));
+                inp.addEventListener('input', () => {
+                    const rkey = inp.getAttribute('data-round');
+                    const sno = inp.getAttribute('data-team');
+                    updateRowTotal(rkey, sno);
+                    debouncedSave();
+                });
+            });
+
+            window.addEventListener('beforeunload', () => saveScores(true));
+            
             const params = new URLSearchParams(window.location.search);
-            if (params.get('tab') === 'setup') switchRound('setup');
+            if (params.get('tab')) switchRound(params.get('tab'));
+            else if (params.get('tab') === 'setup') switchRound('setup');
 
-            // ─── SUCCESS POPUPS ───
-            if (params.get('emailed') === '1') {
-                const sent = params.get('sent') || '?';
-                const failed = parseInt(params.get('failed') || '0');
-                if (failed === 0) {
-                    showPopup('📧', 'Emails Sent!', `All ${sent} project assignment emails were delivered successfully to the students.`);
-                } else {
-                    showPopup('⚠️', `${sent} Sent, ${failed} Failed`, `Some emails could not be delivered. Check the failure list below for details.`, true);
-                }
-            }
-            if (params.get('registered') === '1') {
-                showPopup('🎉', 'Teams Initialized!', 'All teams are now formally registered in the evaluation dashboard and ready for scoring.');
-            }
-            if (params.get('reset') === '1') {
-                showPopup('🗑️', 'Dashboard Reset!', 'All team data and scores have been wiped. Upload a new PSList.csv to start fresh.', true);
-            }
+            if (params.get('emailed') === '1') showPopup('📧', 'Emails Sent!', 'Assignments delivered.');
+            if (params.get('registered') === '1') showPopup('🎉', 'Teams Initialized!', 'Dashboard ready.');
+            if (params.get('reset') === '1') showPopup('🗑️', 'Dashboard Reset!', 'Wiped successfully.', true);
 
-            // ─── LOADING OVERLAY on form submit ───
-            const step1Form = document.querySelector('form[action="/upload_dispatch"]');
-            if (step1Form) {
-                step1Form.addEventListener('submit', () => {
-                    document.getElementById('loadingText').textContent = 'Broadcasting Project Assignments, please wait...';
-                    document.getElementById('loadingOverlay').classList.add('show');
-                });
-            }
-            const step2Form = document.querySelector('form[action="/finalize_registry"]');
-            if (step2Form) {
-                step2Form.addEventListener('submit', () => {
-                    document.getElementById('loadingText').textContent = 'Initializing teams into dashboard...';
-                    document.getElementById('loadingOverlay').classList.add('show');
-                });
-            }
-
-            const selector = document.getElementById('themeSelector');
-            if (selector) selector.value = document.documentElement.getAttribute('data-theme');
+            const step1 = document.querySelector('form[action="/upload_dispatch"]');
+            if (step1) step1.addEventListener('submit', () => {
+                document.getElementById('loadingText').textContent = 'Broadcasting Assignments...';
+                document.getElementById('loadingOverlay').classList.add('show');
+            });
+            const step2 = document.querySelector('form[action="/finalize_registry"]');
+            if (step2) step2.addEventListener('submit', () => {
+                document.getElementById('loadingText').textContent = 'Initializing Teams...';
+                document.getElementById('loadingOverlay').classList.add('show');
+            });
 
             Object.keys(CRITERIA).forEach(rkey => {
                 document.querySelectorAll(`[data-round="${rkey}"]`).forEach(inp => {
@@ -722,36 +758,15 @@
             document.getElementById('popupSub').textContent = sub;
             const card = document.querySelector('.popup-card');
             card.style.borderColor = isWarning ? '#ff9800' : 'var(--primary-neon)';
-            card.style.boxShadow = isWarning
-                ? '0 0 60px rgba(255,152,0,0.25)'
-                : '0 0 60px color-mix(in srgb, var(--primary-neon) 25%, transparent)';
+            card.style.boxShadow = isWarning ? '0 0 60px rgba(255,152,0,0.2)':'0 0 60px color-mix(in srgb,var(--primary-neon) 25%,transparent)';
             document.getElementById('successPopup').classList.add('show');
-            // Auto-close after 5 seconds
-            if (!isWarning) setTimeout(closePopup, 5000);
+            if (!isWarning) setTimeout(() => document.getElementById('successPopup').classList.remove('show'), 5000);
         }
 
         function closePopup() {
             document.getElementById('successPopup').classList.remove('show');
         }
-
-        // ─── Save via form submit + show toast ───
-        async function saveScores() {
-            const btn = document.getElementById('saveBtn');
-            btn.textContent = '⏳ Saving...';
-            btn.disabled = true;
-
-            // Check for over-limit inputs
-            const overLimitInputs = document.querySelectorAll('.criteria-input.over-limit');
-            if (overLimitInputs.length > 0) {
-                alert(`⚠️ ${overLimitInputs.length} field(s) exceed the maximum allowed marks. Please correct them before saving.`);
-                btn.textContent = '💾 Save All Scores';
-                btn.disabled = false;
-                return;
-            }
-
-            // Submit the form
-            document.getElementById('scoringForm').submit();
-        }
+    </script>
 
         // ─── Show toast on redirect-back (via URL param) ───
         const params = new URLSearchParams(window.location.search);
