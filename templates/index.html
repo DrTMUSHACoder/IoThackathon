@@ -60,11 +60,11 @@
                     <tr class="leaderboard-row animate-fade {% if loop.index <= 5 %}top-5-row{% endif %}" style="--delay: {{ loop.index0 * 0.05 }}s; animation-delay: var(--delay);">
                         <td style="text-align: center;">
                             {% if loop.index == 1 %}
-                                <span class="badge-gold">🥇 1st Prize</span>
+                                <span class="badge-gold" style="box-shadow: 0 0 15px rgba(255,193,7,0.4);">🥇 1st Prize</span>
                             {% elif loop.index == 2 %}
-                                <span class="badge-silver">🥈 2nd Prize</span>
+                                <span class="badge-silver" style="box-shadow: 0 0 15px rgba(224,224,224,0.3);">🥈 2nd Prize</span>
                             {% elif loop.index <= 5 %}
-                                <span class="badge-bronze">🥉 3rd Prize</span>
+                                <span class="badge-bronze" style="background: #a5d6a7; color: #1b5e20; box-shadow: 0 0 15px rgba(165,214,167,0.3);">🥉 3rd Prize</span>
                             {% else %}
                                 <div style="color: var(--text-secondary); font-weight: 600;">#{{ loop.index }}</div>
                             {% endif %}

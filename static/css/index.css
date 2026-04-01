@@ -154,22 +154,18 @@ h1, h2, h3, .heading-font {
 .leaderboard-row td:last-child { border-radius: 0 var(--radius-md) var(--radius-md) 0; }
 
 /* 🌟 Top 5 Highlight Styles */
-.top-5-row {
-    background: color-mix(in srgb, var(--accent-gold) 5%, var(--surface-dark));
-    box-shadow: inset 0 0 20px color-mix(in srgb, var(--accent-gold) 15%, transparent);
-}
+.top-5-row { transition: all 0.3s; }
+.top-5-row:nth-child(1) { background: rgba(255, 193, 7, 0.08); border-left: 5px solid #ffc107 !important; }
+.top-5-row:nth-child(2) { background: rgba(224, 224, 224, 0.08); border-left: 5px solid #e0e0e0 !important; }
+.top-5-row:nth-child(n+3):nth-child(-n+5) { background: rgba(165, 214, 167, 0.08); border-left: 5px solid #a5d6a7 !important; }
 
 .top-5-row td {
-    border-top: 1px solid color-mix(in srgb, var(--accent-gold) 40%, transparent);
-    border-bottom: 1px solid color-mix(in srgb, var(--accent-gold) 40%, transparent);
-}
-
-.top-5-row td:first-child {
-    border-left: 4px solid var(--accent-gold);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .top-5-row td:last-child {
-    border-right: 1px solid color-mix(in srgb, var(--accent-gold) 40%, transparent);
+    border-right: 1px solid var(--glass-border);
 }
 
 .top-5-badge {

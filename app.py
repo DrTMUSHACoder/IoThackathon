@@ -329,16 +329,16 @@ def download_results():
             final_mapping = {
                 'Rank': 'Rank',
                 'Prize Category': 'Award',
-                'teamid': 'Team ID',
-                'projectid': 'Project ID',
-                'teamname': 'Team Name',
-                'projecttitle': 'Project Title',
-                'r1_total': 'R1 (15%)',
-                'r2_total': 'R2 (15%)',
-                'r3p1_total': 'R3P1 (20%)',
-                'r3p2_total': 'R3P2 (20%)',
-                'r4_total': 'R4 (30%)',
-                'weighted_total': 'Weighted Total (%)'
+                'TeamID': 'Team ID',
+                'ProjectID': 'Project ID',
+                'TeamName': 'Team Name',
+                'ProjectTitle': 'Project Title',
+                'R1_Total': 'R1 (15%)',
+                'R2_Total': 'R2 (15%)',
+                'R3P1_Total': 'R3P1 (20%)',
+                'R3P2_Total': 'R3P2 (20%)',
+                'R4_Total': 'R4 (30%)',
+                'Weighted_Total': 'Weighted Total (%)'
             }
             
             fexport = fdf.reindex(columns=list(final_mapping.keys()), fill_value=0)
