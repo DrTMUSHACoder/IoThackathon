@@ -73,11 +73,14 @@
             <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem;">Evaluation Credentials Required</p>
             
             {% if error %}
-            <div class="error-msg">{{ error }}</div>
+            <script>alert("{{ error }}");</script>
             {% endif %}
 
-            <form method="POST">
+            <form method="POST" style="text-align: left;">
+                <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px;">Username</label>
                 <input type="text" name="username" class="login-input" placeholder="Admin Username" required>
+
+                <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 1px;">Password</label>
                 <input type="password" name="password" class="login-input" placeholder="Secure Password" required>
                 <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 14px;">
                     Login to Dashboard ⚡

@@ -204,6 +204,8 @@ def login():
         if request.form.get('username')==ADMIN_USERNAME and request.form.get('password')==ADMIN_PASSWORD:
             session['admin_logged_in'] = True
             return redirect(url_for('admin'))
+        else:
+            return render_template('login.html', error="Invalid username or password. Access Denied.")
     return render_template('login.html')
 
 @app.route('/logout')
