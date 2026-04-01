@@ -220,45 +220,50 @@ def upload_dispatch():
     if not file: return redirect(url_for('admin'))
     file.save(REGISTRY_PATH)
     
-    # 📧 Background Broadcast Simulation
     try:
         df = pd.read_csv(REGISTRY_PATH, sep=None, engine='python', encoding_errors='ignore') if REGISTRY_PATH.endswith('.csv') else pd.read_excel(REGISTRY_PATH)
         rows = df.to_dict(orient='records')
-        sent = 0
+        sent, failed_list = 0, []
         sent_emails = set()
+
         for r in rows:
             def f(ks):
                 for k in ks:
                     for rk in r.keys():
                         if k.lower() in str(rk).lower(): return str(r[rk]).strip()
                 return ""
+            
             e = f(['Email', 'Mail']).lower()
-            if "@" in e and e not in sent_emails:
-                n, pid, title = f(['Name', 'Student', 'Team']), f(['Batch', 'Project', 'PID']), f(['Title', 'Problem', 'Statement'])
+            if EMAIL_REGEX.match(e) and e not in sent_emails:
+                n = f(['Name', 'Student', 'Team'])
+                pid = f(['Batch', 'Project', 'PID'])
+                title = f(['Title', 'Problem', 'Statement'])
+                
                 body = f"""Dear Student, 
-
 Greetings from PRAKALP Hackathon Team!
 
-We are pleased to inform you that your problem statement has been officially assigned for the PRAKALP Hackathon.
-
+We are pleased to inform you that your problem statement has been officially assigned.
 Hackathon Project ID: {pid}
 Problem Statement: {title}
 
-You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+Request you to carefully go through the problem statement and start working on your project. Consistency with guidelines and timelines is essential.
 
-If you have any queries, please contact the organizing team.
-
-Wishing you all the best for your Hackathon Journey!
-
+Wishing you all the best!
 Regards,
 PRAKALP Admin Team"""
-                send_email(e, f"PRAKALP Assignment: {pid}", body)
-                sent_emails.add(e)
-                sent += 1
-        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
+                
+                ok, err = send_email(e, f"PRAKALP Assignment: {pid}", body)
+                if ok:
+                    sent_emails.add(e)
+                    sent += 1
+                else:
+                    failed_list.append({'name': n, 'email': e, 'reason': err})
+        
+        session['failed_emails'] = failed_list
+        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&tab=setup')
     except Exception as e:
         print(f"❌ Dispatch error: {e}")
-        return redirect(url_for('admin') + f'?error=dispatch_failed&tab=setup')
+        return redirect(url_for('admin') + f'?error=dispatch_failed&reason={str(e)}&tab=setup')
 
 @app.route('/finalize_registry', methods=['POST'])
 def finalize_registry():
