@@ -31,10 +31,10 @@
         {% if session.get('admin_logged_in') %}
             {% if request.endpoint == 'admin' %}
             <a href="/download_results" class="btn-primary" style="padding: 0 16px; font-size: 0.8rem; border-radius: 8px; text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(0, 243, 255, 0.08); border: 1px solid var(--primary-neon); color: var(--primary-neon); white-space: nowrap; height: 38px; box-sizing: border-box;">
-                📥 Download Excel
+                📥 Download Score Excel File
             </a>
             <button onclick="saveScores()" id="saveBtn" class="btn-primary" style="padding: 0 16px; font-size: 0.8rem; border-radius: 8px; display: flex; align-items: center; gap: 8px; height: 38px; box-sizing: border-box; white-space: nowrap; cursor: pointer;">
-                💾 Save Database
+                💾 Always Save in Database
             </button>
             {% endif %}
             
