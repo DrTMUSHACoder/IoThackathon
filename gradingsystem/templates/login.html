@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - PRAKALP 2026</title>
+    <script>
+        const currTheme = localStorage.getItem('theme') || 'neon-blue';
+        document.documentElement.setAttribute('data-theme', currTheme);
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('themeSelector');
+            if (selector) selector.value = document.documentElement.getAttribute('data-theme');
+        });
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <style>
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 76px);
+            padding: 20px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary-neon);
+            background: color-mix(in srgb, var(--primary-neon) 5%, transparent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-neon) 12%, transparent);
+        }
+        .error-msg {
+            color: var(--error);
+            background: color-mix(in srgb, var(--error) 10%, transparent);
+            padding: 10px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🌍 Global Navbar 🌍 -->
+    {% include 'header.html' %}
+
+    <div class="login-container animate-fade">
+        <div class="glass-card login-card">
+            <h2 class="heading-font" style="margin-bottom: 10px; font-size: 2rem;">Admin Login</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem;">Evaluation Credentials Required</p>
+            
+            {% if error %}
+            <div class="error-msg">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <input type="text" name="username" class="login-input" placeholder="Admin Username" required>
+                <input type="password" name="password" class="login-input" placeholder="Secure Password" required>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 14px;">
+                    Login to Dashboard ⚡
+                </button>
+            </form>
+            
+            <div style="margin-top: 24px;">
+                <a href="/" style="color: var(--primary-neon); text-decoration: none; font-size: 0.85rem;">← Public Leaderboard</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

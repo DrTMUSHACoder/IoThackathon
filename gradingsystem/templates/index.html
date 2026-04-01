@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRAKALP IoT Hackathon - Live Leaderboard</title>
+    <script>
+        const currTheme = localStorage.getItem('theme') || 'neon-blue';
+        document.documentElement.setAttribute('data-theme', currTheme);
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('themeSelector');
+            if (selector) selector.value = document.documentElement.getAttribute('data-theme');
+        });
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+
+    <!-- 🌍 Global Navbar 🌍 -->
+    {% include 'header.html' %}
+
+    <div class="container animate-fade">
+        <header style="padding: 25px 0 15px 0; text-align: center;">
+            <h1 style="font-size: 3rem; margin: 0; background: linear-gradient(90deg, var(--primary-neon), var(--secondary-neon)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.3));">
+                PRAKALP 2026
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 8px; letter-spacing: 1px; text-transform: uppercase;">
+                IoT Sprint Hackathon • {{ teams|length }} Teams Live
+            </p>
+        </header>
+
+        <!-- 🏆 TOP 5 WINNERS CIRCLE 🏆 -->
+        <section class="winners-circle animate-fade" style="margin-bottom: 40px;">
+            <h2 class="heading-font" style="text-align: center; margin-bottom: 24px; color: var(--accent-gold); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                <span>✨</span> Top 5 Hall of Fame <span>✨</span>
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                {% for team in teams[:5] %}
+                <div class="glass-card winner-card" style="padding: 20px; text-align: center; border: 2px solid {% if loop.index == 1 %}var(--accent-gold){% elif loop.index == 2 %}#e6e6e6{% else %}#cd7f32{% endif %}; position: relative; overflow: visible;">
+                    <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 5;">
+                        {% if loop.index == 1 %}
+                            <span class="badge-gold" style="font-size: 1rem; box-shadow: 0 0 15px var(--accent-gold);">🥇 1st Prize</span>
+                        {% elif loop.index == 2 %}
+                            <span class="badge-silver" style="font-size: 1rem; box-shadow: 0 0 15px #e6e6e6;">🥈 2nd Prize</span>
+                        {% else %}
+                            <span class="badge-bronze" style="font-size: 1rem; box-shadow: 0 0 15px #cd7f32;">🥉 3rd Prize</span>
+                        {% endif %}
+                    </div>
+                    <div style="margin-top: 15px; font-weight: 800; font-size: 1.25rem; color: var(--text-primary); margin-bottom: 5px;">{{ team.TeamName }}</div>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: var(--primary-neon);">{{ "%.2f"|format(team.Weighted_Total|float) }}%</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 10px;">
+                        {{ team.TeamID }} | {{ team.ProjectTitle[:30] }}{% if team.ProjectTitle|length > 30 %}...{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <main class="glass-card" style="padding: 24px; margin-bottom: 40px;">
+            <h2 class="heading-font" style="margin-top: 0; margin-bottom: 16px; font-size: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                Full Leaderboard Rankings
+                <span class="badge-gold">Live Updates</span>
+            </h2>
+
+            <!-- Applying inline tight-spacing to emulate Admin Panel compact format -->
+            <table class="leaderboard-table" style="border-spacing: 0 4px;">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Rank</th>
+                        <th>Team & Project</th>
+                        <th style="width: 80px; text-align: center;">Round 1</th>
+                        <th style="width: 80px; text-align: center;">Round 2</th>
+                        <th style="width: 80px; text-align: center;">Round 3 P1</th>
+                        <th style="width: 80px; text-align: center;">Round 3 P2</th>
+                        <th style="width: 80px; text-align: center;">Round 4</th>
+                        <th style="width: 120px; text-align: center;">Weighted Score (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                    <tr class="leaderboard-row animate-fade {% if loop.index <= 5 %}top-5-row{% endif %}" style="--delay: {{ loop.index0 * 0.05 }}s; animation-delay: var(--delay);">
+                        <td style="text-align: center;">
+                            {% if loop.index == 1 %}
+                                <span class="badge-gold">🥇 1st Prize</span>
+                            {% elif loop.index == 2 %}
+                                <span class="badge-silver">🥈 2nd Prize</span>
+                            {% elif loop.index <= 5 %}
+                                <span class="badge-bronze">🥉 3rd Prize</span>
+                            {% else %}
+                                <div style="color: var(--text-secondary); font-weight: 600;">#{{ loop.index }}</div>
+                            {% endif %}
+                            
+                            {% if session.get('admin_logged_in') and loop.index <= 5 %}
+                            <div style="margin-top: 12px;">
+                                <form action="/announce_prize" method="post">
+                                    <input type="hidden" name="team_id" value="{{ team.TeamID }}">
+                                    <input type="hidden" name="rank" value="{{ loop.index }}">
+                                    <button type="submit" style="background: rgba(0,0,0,0.3); border: 1px solid var(--primary-neon); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; gap: 6px;">
+                                        📧 Email Prize
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-weight: 700; font-size: 1.1rem; color: var(--primary-neon);">{{ team.TeamName }}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">
+                                <span style="color: var(--accent-gold); font-weight: 600;">{{ team.TeamID }}</span> | 
+                                PID: <span style="font-weight: 600; color: var(--text-primary);">{{ team.ProjectID }}</span> | 
+                                {{ team.ProjectTitle }}
+                            </div>
+                        </td>
+                        <td style="text-align: center; color: var(--text-secondary); font-weight: 700;">{{ team.R1_Grade or '-' }}</td>
+                        <td style="text-align: center; color: var(--text-secondary); font-weight: 700;">{{ team.R2_Grade or '-' }}</td>
+                        <td style="text-align: center; color: var(--text-secondary); font-weight: 700;">{{ team.R3P1_Grade or '-' }}</td>
+                        <td style="text-align: center; color: var(--text-secondary); font-weight: 700;">{{ team.R3P2_Grade or '-' }}</td>
+                        <td style="text-align: center; color: var(--text-secondary); font-weight: 700;">{{ team.R4_Grade or '-' }}</td>
+                        <td style="text-align: center;">
+                            <span style="font-weight: 800; color: var(--primary-neon); font-size: 1.25rem;">
+                                {{ "%.2f"|format(team.Weighted_Total|float) }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main>
+
+        <footer style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; padding-bottom: 40px;">
+            Designed for IoT Sprint Hackathon Excellence • Persistent Local Database Enabled (.csv/.mdb)
+        </footer>
+    </div>
+
+    <!-- ═══ Action Toasts ═══ -->
+    <div class="save-toast" id="saveToast" style="background: rgba(39, 174, 96, 0.9);">✅ Action completed successfully!</div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('announced')) {
+            const toast = document.getElementById('saveToast');
+            if (toast) {
+                toast.textContent = '📧 Prize Announcement correctly sent to Team ' + params.get('announced') + '!';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 5000);
+            }
+        }
+    </script>
+</body>
+</html>
