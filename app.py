@@ -113,16 +113,21 @@ def initialize_db(path=None, wipe=False):
                                 email = val.strip()
                                 break
                     
-                    if "@" in email:
-                        tid = f(['Batch', 'TeamID', 'ProjectID']) or f(['No', 'ID']) or "0"
-                        pid = f(['Batch', 'ProjectID', 'PID']) or "PR-IOT"
-                        name = f(['Name', 'Student', 'Team']) or "Anonymous Team"
-                        title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
+                    # 🚀 FALLBACK: If still no email, use a placeholder to allow import
+                    if not email or "@" not in email:
+                        roll = f(['Roll', 'Number', 'Reg'])
+                        name_slug = f(['Name', 'Student']).lower().replace(" ", "")
+                        email = f"{roll or name_slug}@prakalp-hackathon.com"
+
+                    tid = f(['Batch', 'TeamID', 'ProjectID', 'S.No']) or "0"
+                    pid = f(['Batch', 'ProjectID', 'PID']) or "PR-IOT"
+                    name = f(['Name', 'Student', 'Team']) or "Anonymous Team"
+                    title = f(['Title', 'Problem', 'Statement']) or "Untitled Project"
                         
-                        if isinstance(c, sqlite3.Connection):
-                            cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
-                        else:
-                            cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
+                    if isinstance(c, sqlite3.Connection):
+                        cur.execute("INSERT OR REPLACE INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (?,?,?,?,?)", (tid, pid, name, title, email))
+                    else:
+                        cur.execute("INSERT INTO teams (teamid, projectid, teamname, projecttitle, email) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (teamid) DO UPDATE SET projectid=EXCLUDED.projectid, teamname=EXCLUDED.teamname, projecttitle=EXCLUDED.projecttitle, email=EXCLUDED.email;", (tid, pid, name, title, email))
                 except Exception as row_err:
                     print(f"⚠️ Row error: {row_err}")
                     continue
