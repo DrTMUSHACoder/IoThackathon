@@ -196,7 +196,9 @@ def send_email(to, sub, body, server=None):
         return False, str(e)
 
 @app.route('/')
-def index(): return render_template('index.html', teams=get_teams())
+def index():
+    if not session.get('admin_logged_in'): return redirect(url_for('login'))
+    return render_template('index.html', teams=get_teams())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
