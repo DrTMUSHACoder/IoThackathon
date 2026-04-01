@@ -8,6 +8,16 @@
     <script>
         const currTheme = localStorage.getItem('theme') || 'neon-blue';
         document.documentElement.setAttribute('data-theme', currTheme);
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('themeSelector');
+            if (selector) selector.value = document.documentElement.getAttribute('data-theme');
+        });
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <style>
