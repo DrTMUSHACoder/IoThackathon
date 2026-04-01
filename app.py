@@ -174,12 +174,18 @@ def send_email(to, sub, body):
         msg = EmailMessage()
         msg.set_content(body)
         msg['Subject'] = sub
-        msg['From'] = f"PRAKALP 2026<{SENDER_EMAIL}>"
+        msg['From'] = f"PRAKALP 2026 Admin <{SENDER_EMAIL}>"
         msg['To'] = to.strip()
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
+        # 🚀 Gmail SMTP_SSL on Port 465
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as s:
             s.login(SENDER_EMAIL, SENDER_PASSWORD)
             s.send_message(msg)
-    except: pass
+        return True, "Sent"
+    except Exception as e:
+        err = str(e)
+        if "Authentication failed" in err: return False, "Auth Failure: Check App Password"
+        if "quota" in err.lower(): return False, "Gmail Daily Quota Exceeded"
+        return False, err
 
 @app.route('/')
 def index():
@@ -228,21 +234,26 @@ def upload_dispatch():
     if not file: return redirect(url_for('admin'))
     file.save(REGISTRY_PATH)
     
-    # 📧 Background Broadcast Simulation
     try:
         df = pd.read_csv(REGISTRY_PATH, sep=None, engine='python', encoding_errors='ignore') if REGISTRY_PATH.endswith('.csv') else pd.read_excel(REGISTRY_PATH)
         rows = df.to_dict(orient='records')
         sent = 0
+        failed_list = []
         sent_emails = set()
+        
         for r in rows:
             def f(ks):
                 for k in ks:
                     for rk in r.keys():
                         if k.lower() in str(rk).lower(): return str(r[rk]).strip()
                 return ""
-            e = f(['Email', 'Mail']).lower()
+            
+            e = f(['Email', 'Mail', 'Student Email', 'ID']).lower()
             if "@" in e and e not in sent_emails:
-                n, pid, title = f(['Name', 'Student', 'Team']), f(['Batch', 'Project', 'PID']), f(['Title', 'Problem', 'Statement'])
+                pid = f(['Batch', 'Project', 'ID', 'PID'])
+                n = f(['Name', 'Student', 'Team'])
+                title = f(['Title', 'Problem', 'Statement'])
+                
                 body = f"""Dear Student, 
 
 Greetings from PRAKALP Hackathon Team!
@@ -252,18 +263,22 @@ We are pleased to inform you that your problem statement has been officially ass
 Hackathon Project ID: {pid}
 Problem Statement: {title}
 
-You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
+You are requested to carefully go through the problem statement and start working on your project.
 
-If you have any queries, please contact the organizing team.
-
-Wishing you all the best for your Hackathon Journey!
+Wishing you all the best!
 
 Regards,
 PRAKALP Admin Team"""
-                send_email(e, f"PRAKALP Assignment: {pid}", body)
-                sent_emails.add(e)
-                sent += 1
-        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
+                success, reason = send_email(e, f"PRAKALP Assignment: {pid}", body)
+                if success:
+                    sent += 1
+                    sent_emails.add(e)
+                else:
+                    failed_list.append({'name': n or 'Unknown', 'email': e, 'reason': reason})
+        
+        # Store failure details for dashboard banner
+        session['failed_emails'] = failed_list
+        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&step1_done=1&tab=setup')
     except Exception as e:
         print(f"❌ Dispatch error: {e}")
         return redirect(url_for('admin') + f'?error=dispatch_failed&tab=setup')
