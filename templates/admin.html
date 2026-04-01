@@ -609,25 +609,19 @@
             {% endfor %}
         };
 
-        // ─── Refactored saveScores to use FETCH for async background sync ───
-        let saveTimeout;
-        async function saveScores(isAuto = false) {
+        // ─── Manual Sync Only (Requested) ───
+        async function saveScores() {
             const btn = document.getElementById('saveBtn');
             const toast = document.getElementById('saveToast');
             
-            if (!isAuto) {
-                btn.textContent = '⏳ Manual Sync...';
-                btn.disabled = true;
-            }
+            btn.textContent = '⏳ Manual Syncing...';
+            btn.disabled = true;
 
-            // Check for over-limit inputs before saving
             const overLimitInputs = document.querySelectorAll('.criteria-input.over-limit');
             if (overLimitInputs.length > 0) {
-                if (!isAuto) {
-                    alert(`⚠️ ${overLimitInputs.length} field(s) exceed maximum marks. Correct before saving.`);
-                    btn.textContent = '💾 Always Save in Database';
-                    btn.disabled = false;
-                }
+                alert(`⚠️ ${overLimitInputs.length} field(s) exceed maximum marks. Correct before saving.`);
+                btn.textContent = '💾 Always Save in Database';
+                btn.disabled = false;
                 return;
             }
 
@@ -639,29 +633,19 @@
                 });
 
                 if (response.ok) {
-                    toast.textContent = isAuto ? '🔄 Auto-Sync Complete (Live)' : '✅ Database Mathematically Locked!';
+                    toast.textContent = '✅ Database Mathematically Locked!';
                     toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), isAuto ? 1500 : 3000);
+                    setTimeout(() => toast.classList.remove('show'), 3000);
                 }
             } catch (err) {
                 console.error('❌ Sync Error:', err);
             } finally {
-                if (!isAuto) {
-                    btn.textContent = '💾 Always Save in Database';
-                    btn.disabled = false;
-                }
+                btn.textContent = '💾 Always Save in Database';
+                btn.disabled = false;
             }
         }
 
-        // Debounced save for live input
-        function debouncedSave() {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(() => saveScores(true), 2500); 
-        }
-
-        // ─── Switch active round panel (Now triggers immediate save) ───
         function switchRound(rkey) {
-            saveScores(true);
             document.querySelectorAll('.round-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.round-panel').forEach(p => p.classList.remove('active'));
             document.getElementById('tab-' + rkey).classList.add('active');
@@ -689,9 +673,7 @@
                 total += Math.min(val, c.max);
             });
             const display = document.getElementById(`total-${rkey}-${sno}`);
-            if (display) {
-                display.textContent = Math.round(total);
-            }
+            if (display) display.textContent = Math.round(total);
             updateCumulative(sno);
         }
 
@@ -714,17 +696,13 @@
 
         document.addEventListener('DOMContentLoaded', () => {
              document.querySelectorAll('.criteria-input').forEach(inp => {
-                inp.addEventListener('blur', () => saveScores(true));
                 inp.addEventListener('input', () => {
                     const rkey = inp.getAttribute('data-round');
                     const sno = inp.getAttribute('data-team');
                     updateRowTotal(rkey, sno);
-                    debouncedSave();
                 });
             });
 
-            window.addEventListener('beforeunload', () => saveScores(true));
-            
             const params = new URLSearchParams(window.location.search);
             if (params.get('tab')) switchRound(params.get('tab'));
             else if (params.get('tab') === 'setup') switchRound('setup');
@@ -732,17 +710,6 @@
             if (params.get('emailed') === '1') showPopup('📧', 'Emails Sent!', 'Assignments delivered.');
             if (params.get('registered') === '1') showPopup('🎉', 'Teams Initialized!', 'Dashboard ready.');
             if (params.get('reset') === '1') showPopup('🗑️', 'Dashboard Reset!', 'Wiped successfully.', true);
-
-            const step1 = document.querySelector('form[action="/upload_dispatch"]');
-            if (step1) step1.addEventListener('submit', () => {
-                document.getElementById('loadingText').textContent = 'Broadcasting Assignments...';
-                document.getElementById('loadingOverlay').classList.add('show');
-            });
-            const step2 = document.querySelector('form[action="/finalize_registry"]');
-            if (step2) step2.addEventListener('submit', () => {
-                document.getElementById('loadingText').textContent = 'Initializing Teams...';
-                document.getElementById('loadingOverlay').classList.add('show');
-            });
 
             Object.keys(CRITERIA).forEach(rkey => {
                 document.querySelectorAll(`[data-round="${rkey}"]`).forEach(inp => {
@@ -767,19 +734,10 @@
             document.getElementById('successPopup').classList.remove('show');
         }
 
-        // ─── Show toast on redirect-back (via URL param) ───
         const urlParams = new URLSearchParams(window.location.search);
         const toastEl = document.getElementById('saveToast');
         if (urlParams.get('saved') === '1') {
             toastEl.textContent = '✅ Scores mathematically locked successfully!';
-            toastEl.classList.add('show');
-            setTimeout(() => toastEl.classList.remove('show'), 3500);
-        } else if (urlParams.get('registered') === '1') {
-            toastEl.textContent = '✅ Database successfully populated with Registry!';
-            toastEl.classList.add('show');
-            setTimeout(() => toastEl.classList.remove('show'), 3500);
-        } else if (urlParams.get('emailed') === '1') {
-            toastEl.textContent = '📧 Startup Project ID emails securely dispatched!';
             toastEl.classList.add('show');
             setTimeout(() => toastEl.classList.remove('show'), 3500);
         }
