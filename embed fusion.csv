@@ -1,0 +1,62 @@
+S.No,Batch NO,Name of The Student,Branch,Roll Number,Year,Mobile Number,Email,Problem Statement
+1,ECE - EF-001 (Venue 1),V. MANOHAR,ECE,25ME1A04J3,I,7981106604,vanjarapumanohar33@gmail.com,IoT Pet Feeding Reminder
+2,ECE - EF-002 (Venue 1),P. MEGHANA,ECE,25ME1A04H5,I,9391275462,pallaganimeghana50@gmail.com,Noise Pollution Monitor
+3,ECE - EF-003 (Venue 1),A. JAYAVARDHAN SAI VINAY,ECE,24ME1A04D5,II,8106038337,jayavardhansaivinay@gmail.com,Smart Baby Monitor
+4,ECE - EF-004 (Venue 1),CH. VARSHINI,ECE,24ME1A04E6,II,7661051191,varshinichintada@gmail.com,OTP-Based Smart Locker
+5,ECE - EF-005 (Venue 1),M. N V RAGHU RAM,ECE,24ME1A04H4,II,7661853633,mraghuram1918@gmail.com,Weather Monitoring System
+6,ECE - EF-006 (Venue 1),K. POORNA SANDHYA,ECE,24ME1A04F8,II,6281341952,karuturisandhya7@gmail.com,Target Shooting Detection
+7,ECE - EF-007 (Venue 1),R. AVINASH,ECE,23ME1A0453,III,9030176597,ravinash020602@gmail.com,Indoor Air Quality Monitor
+8,ECE - EF-008 (Venue 1),P.TEJASRI,ECE,24ME1A04H3,II,8019707468,tejasripadamati30@gmail.com,Smart Medicine Reminder
+9,ECE - EF-009 (Venue 1),J. SANTHOSH KUMAR,CIVIL,24ME1A0114,II,9618746602,san.nani17320@gmail.com,Health Monitoring Dashboard
+10,ECE - EF-010 (Venue 1),M. VANI,EEE,24ME1A0232,II,8247721646,mattavani1110@gmail.com,Smart Compost Monitor
+11,ECE - EF-011 (Venue 1),P. PAVAN,EEE,24ME1A0236,II,7659976514,ppavan54525@gmail.com,Plant Health Monitor
+12,ECE - EF-012 (Venue 1),T.SHANKAR,ECE,24ME1A0460,II,8367202620,m.rismartshankar57@gmail.com,Fall Detection Alert
+13,ECE - EF-013 (Venue 1),CH. SARANYA,ECE,24ME1A0474,II,6301815185,saranyachennakesavula22@gmail.com,Child Safety Monitor
+14,ECE - EF-014 (Venue 1),T. PRANEETHA,EEE,24ME1A0244,II,9603464555,praneethathummuri@gmail.com,Smart Bin Monitoring
+15,ECE - EF-015 (Venue 1),AGURLA. ABHILASH,EEE,23H51A0202,III,7893530610,agurlaabhilash@gmail.com,Intruder Alert System
+16,ECE - EF-016 (Venue 1),K. D.DEDEEPYA,ECE,24MEA10493,II,7093049363,kothapallidedeepya68@gmail.com,Smart Home Automation
+17,ECE - EF-017 (Venue 1),K YADIDYA,ECE,23ME1A0494,III,7993070573,konayadidya@gmail.com,RFID Smart Parking Gate
+18,ECE - EF-018 (Venue 1),V. SAI TEJASWINI,ECE,23ME1A04J7,III,8639801878,vempatisaitejasini016@gmail.com,RFID Attendance System
+19,ECE - EF-019 (Venue 1),A. NAVYA,EEE,24ME1A0201,II,9014209807,akulanavya310@gmail.com,Voice Controlled Home Automation
+20,ECE - EF-020 (Venue 1),K. LAKSHMI NARAYANA,ECE,25ME1A0429,I,7672060945,narayana141149@gmail.com,RFID Attendance System
+21,ECE - EF-021 (Venue 1),G.TRIVENI,ECE,25ME1A0419,I,9346360379,gumputriveni057@gmail.com,Smart Door Lock
+22,ECE - EF-022 (Venue 1),K.HEMALATHA,ECE,25ME1A0430,I,9849320284,kondrothuharitha@gmail.com,Bluetooth HID Mouse
+23,ECE - EF-023 (Venue 1),P.CHANDRIKA,ECE,24ME1A0447,II,9392077533,petluchandika@gmail.com,Access Point Control System
+24,ECE - EF-024 (Venue 1),G.LIKHITHA,ECE,25ME1A0421,I,8688845885,glfmmm014@gmail.com,ESP32 IoT Hub
+25,ECE - EF-025 (Venue 1),N.JYOSTHNA,ECE,24ME1A0440,II,7671032023,neelamjyothsnasaiteja@gmail.com,Rainfall Monitor
+26,ECE - EF-026 (Venue 2),S.LOHITAAKSH,ECE,24ME1A0454,II,9347342193,lohitaaksh123@gmail.com,RFID Attendance System
+27,ECE - EF-027 (Venue 2),S.GNANADEEPIKA,ECE,25ME5A0406,II,9032313106,deepikagnana1310@gmail.com,OTP-Based Smart Locker
+28,ECE - EF-028 (Venue 2),HARSHA MUKESH,ECE,2400049042,II,7382474810,harshamukesh1706@gmail.com,LPG Gas Leakage Detection
+29,ECE - EF-029 (Venue 2),CH.N.V.SAI GOPALA KRISHNA,ECE,24ME1A0414,II,9618115446,saichanda62@gmail.com,IoT Pet Feeding Reminder
+30,ECE - EF-030 (Venue 2),MD. MOHSEEN,ECE,24ME1A0437,II,7075514833,mohammadmohseen293@gmail.com,Smart Electricity Monitor
+31,ECE - EF-031 (Venue 2),P.JAHNAVAI,ECE,24M31A0449,II,8500693657,jahnavipulavarthi9@gmail.com,ESP32 IoT Hub
+32,ECE - EF-032 (Venue 2),D.YASHWANTH,ECE,25ME1A04F3,I,8179376179,y93840822@gmail.com,Machine Fault Detection
+33,ECE - EF-033 (Venue 2),B.AKHILA,ECE,24ME1A0412,II,9603983467,buradaakhi@gmail.com,Smart Irrigation System
+34,ECE - EF-034 (Venue 2),K.YOSHITHA,ECE,24ME1A0428,II,9391746499,yoshithakandula82@gmail.com,Rainfall Monitor
+35,ECE - EF-035 (Venue 2),O.KISHORE,ECE,24ME1A0443,II,9059003203,ogireddykishore5@gmail.com,Smart Water Level Monitor
+36,ECE - EF-036 (Venue 2),A.SYAM SAI TEJA,ECE,24ME1A04C3,II,7569568822,syamsaitejatej@gmail.com,Smart Door Lock
+37,ECE - EF-037 (Venue 2),V MOUNIKA DEVI,ECE,23ME1A04B0,III,9032854569,vejjumounikadevi@gmail.com,Smart Energy Meter
+38,ECE - EF-038 (Venue 2),B VIJAY,ECE,24ME1A04E3,II,9392318502,vijaybulla75@gmail.com,ESP32 IoT Hub
+39,ECE - EF-039 (Venue 2),K.DEEPA VARSHINI,CIVIL,24ME1A0119,II,8977987477,varshieereddy@gmail.com,OTP-Based Smart Locker
+40,ECE - EF-040 (Venue 2),V.DHARANI,EEE,24ME1A0254,II,7330984859,dharaniveeranki8@gmail.com,Smart Door Lock
+41,ECE - EF-041 (Venue 2),MD.SAMEER,ECE,23ME1A0440,III,9052412315,mdsameerahmad15i@gmail.com,Child Safety Monitor
+42,ECE - EF-042 (Venue 2),Y.SRAVANI,ECE,24ME1A04D2,II,7995936653,ysravani187@gmail.com,Smart Energy Meter
+43,ECE - EF-043 (Venue 2),Y.PRANATHI,EEE,24ME1A0257,II,9392400843,pranathi1403@gmail.com,Smart Electricity Monitor
+44,ECE - EF-044 (Venue 2),K MOHANA RAO,MECH,25ME1A0320,I,8317546398,mohanaraokella2@gmail.com,Smart Water Level Monitor
+45,ECE - EF-045 (Venue 2),K.HEMA HARINI,EEE,24ME1A0225,II,9652557756,harinihoneyk2007@gmail.com,Machine Fault Detection
+46,ECE - EF-046 (Venue 2),B.MANGA DEVI,ECE,23ME1A0406,III,9652822215,mangadevibhusarapu@gmail.com,RFID Attendance System
+47,ECE - EF-047 (Venue 3),M. KANAKA DURGA BHAVANI,ECE,23ME1A0437,III,7842502334,mandapatibhavani15@gmail.com,Smart Energy Meter
+48,ECE - EF-048 (Venue 3),M. SAI PRASANNA,ECE,23ME1A0438,III,8247526929,mattasaiprasanna@gmail.com,Smart Parking System
+49,ECE - EF-049 (Venue 3),D.NISHANTH,ECE,24ME1A04E7,II,8309425579,nishanthdevathoti@gmail.com,Smart Water Level Monitor
+50,ECE - EF-050 (Venue 3),M.DIVYA SATHVIKA,ECE,24ME1A04G3,II,9030061818,mamididivyasathvika@gmail.com,Target Shooting Detection
+51,ECE - EF-051 (Venue 3),P.HIMA VARSHINI,ECE,25ME1A04H6,I,9441813867,himavarshinipedapudi0@gmail.com,Smart Helmet Detection
+52,ECE - EF-052 (Venue 3),P.SAHITHYA LAKSHMI,ECE,25ME1A04H7,I,9154232578,Peddireddysahithya@gmail.com,LPG Gas Leakage Detection
+53,ECE - EF-053 (Venue 3),G CHANDHU,ECE,24ME1A04F3,II,7416111261,chandugunji007@gmail.com,Color Sorting System
+54,ECE - EF-054 (Venue 3),V.PAVAN SAI KUMAR,ECE,24ME1A0461,II,9030912005,pavansaikumarveeramallu7@gmail.com,Obstacle Detection Radar
+55,ECE - EF-055 (Venue 3),G.MOHANANJANI,ECE,24ME1A0422,II,7075273181,anjanigoriparthi@gmail.com,OTP-Based Smart Locker
+56,ECE - EF-056 (Venue 3),A.TEJA,ECE,24ME1A0405,II,9642730855,tejaalthi8@gmail.com,Obstacle Detection Radar
+57,ECE - EF-057 (Venue 3),J.ASHA SRI,ECE,24ME1A0424,II,8919451849,jakkaashasri@gmail.com,Child Safety Monitor
+58,ECE - EF-058 (Venue 3),MD.KARISHMA,ECE,24ME1A04G5,II,9701257388,mdkarishma006@gmail.com,LPG Gas Leakage Detection
+59,ECE - EF-059 (Venue 3),K. SUBHASHINI,CIVIL,24ME1A0118,II,8897637638,subhashinikanagala95@gmail.com,Color Sorting System
+60,ECE - EF-060 (Venue 3),Y.PRASANNA,ECE,24ME1A0464,II,9848538269,prasannayadlapalli03@gmail.com,Heart Rate Monitoring
+61,ECE - EF-061 (Venue 3),GUDURI DEEKSHITHA,ECE,22ME1A04D7,IV,9440232686,deekshithavarma45@gmail.com,Bike Speed Monitor
