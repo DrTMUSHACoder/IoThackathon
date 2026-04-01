@@ -233,3 +233,77 @@ h1, h2, h3, .heading-font {
 .rce-brand-text { display: flex; flex-direction: column; }
 .rce-title { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 800; line-height: 1.1; color: #d35400; letter-spacing: 0.5px; }
 .rce-subtitle { font-size: 0.7rem; font-weight: 600; color: #2980b9; letter-spacing: 1px; text-transform: uppercase; }
+
+/* 📱 MOBILE RESPONSIVENESS OVERRIDES */
+@media (max-width: 1024px) {
+    .global-navbar {
+        height: auto;
+        padding: 12px 16px;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        text-align: center;
+    }
+    .global-navbar div, .global-navbar-brand, .global-navbar div:last-child {
+        justify-content: center !important;
+        flex: 1 1 100% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 16px; }
+    
+    h1 { font-size: 1.8rem !important; }
+    
+    /* Table Responsive Wrapper */
+    main.glass-card { overflow-x: auto; padding: 12px !important; }
+    
+    .leaderboard-table th, .leaderboard-table td {
+        padding: 12px 8px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    /* Hide non-essential columns on small phones to prevent horizontal clutter */
+    @media (max-width: 480px) {
+        .leaderboard-table th:nth-child(3), 
+        .leaderboard-table th:nth-child(4),
+        .leaderboard-table th:nth-child(5),
+        .leaderboard-table th:nth-child(6),
+        .leaderboard-table th:nth-child(7),
+        .leaderboard-table td:nth-child(3),
+        .leaderboard-table td:nth-child(4),
+        .leaderboard-table td:nth-child(5),
+        .leaderboard-table td:nth-child(6),
+        .leaderboard-table td:nth-child(7) {
+            display: none !important;
+        }
+    }
+    
+    /* Admin specific tweaks */
+    .admin-header {
+        flex-direction: column;
+        top: 0 !important;
+        padding: 16px !important;
+        gap: 12px !important;
+    }
+    
+    .round-tabs {
+        overflow-x: auto;
+        padding: 12px 16px 0 !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .round-tab {
+        flex: 0 0 auto;
+        min-width: 100px;
+    }
+    
+    .criteria-input { width: 50px !important; font-size: 0.85rem !important; }
+}
+
+/* 🎨 Touch Friendly UI Enhancements */
+@media (pointer: coarse) {
+    .btn-primary, .btn-secondary, .round-tab {
+        min-height: 44px;
+        align-items: center;
+    }
+}

@@ -276,24 +276,86 @@ import io
 @app.route('/download_results')
 def download_results():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    teams = get_teams()
+    teams = get_teams() # This is already sorted by Weighted_Total desc
     if not teams: return "No data found."
-    
-    # 📊 Create Excel with Pandas
-    df = pd.DataFrame(teams)
-    
-    # 🧹 Clean up for export
-    cols = ['TeamID', 'ProjectID', 'TeamName', 'ProjectTitle', 'Email', 
-            'R1_Total', 'R2_Total', 'R3P1_Total', 'R3P2_Total', 'R4_Total', 
-            'Weighted_Total', 'Raw_Total']
-    df = df[[c for c in cols if c in df.columns]]
     
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Hackathon Results')
+        # 🧪 1-5: Detailed Round Sheets
+        for rkey, rmeta in SCORING_META.items():
+            if rkey == 'setup': continue
+            fields = [c['field'] for c in rmeta['criteria']]
+            cols = ['TeamID', 'TeamName'] + fields + [f'{rkey}_Total']
+            rdf = pd.DataFrame(teams)[cols]
+            rdf.columns = ['Team ID', 'Team Name'] + [c['label'] for c in rmeta['criteria']] + ['Total Score']
+            rdf.to_excel(writer, index=False, sheet_name=rmeta['label'])
+            
+            # 🔥 Basic Auto-Formatting for Round Sheets
+            ws = writer.sheets[rmeta['label']]
+            for col in ws.columns:
+                max_len = max([len(str(cell.value)) for cell in col])
+                ws.column_dimensions[col[0].column_letter].width = max_len + 5
+
+        # 🏆 6: FINAL PRINT-READY STANDINGS
+        fdf = pd.DataFrame(teams)
+        fdf.insert(0, 'Rank', range(1, len(fdf) + 1))
+        
+        def assign_prize(rank):
+            if rank == 1: return "🥇 1st Prize"
+            if rank == 2: return "🥈 2nd Prize"
+            if rank <= 5: return "🥉 3rd Prize"
+            return ""
+        
+        fdf.insert(1, 'Prize Category', fdf['Rank'].apply(assign_prize))
+        
+        final_cols = ['Rank', 'Prize Category', 'TeamID', 'ProjectID', 'TeamName', 'ProjectTitle', 
+                      'R1_Total', 'R2_Total', 'R3P1_Total', 'R3P2_Total', 'R4_Total', 'Weighted_Total']
+        fexport = fdf[final_cols].copy()
+        fexport.columns = ['Rank', 'Award', 'Team ID', 'Project ID', 'Team Name', 'Project Title', 
+                           'R1 (15%)', 'R2 (15%)', 'R3P1 (20%)', 'R3P2 (20%)', 'R4 (30%)', 'Weighted Total (%)']
+        
+        fexport.to_excel(writer, index=False, sheet_name='Final Standings')
+        
+        # 🎨 Management-Standard Formatting for Final sheet
+        from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+        ws = writer.sheets['Final Standings']
+        
+        # Header Style
+        header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
+        header_font = Font(color="FFFFFF", bold=True, size=12)
+        center_align = Alignment(horizontal="center", vertical="center")
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = center_align
+            cell.border = thin_border
+
+        # Highlighting & Alignment for data
+        gold_fill = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
+        silver_fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+        bronze_fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
+
+        for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+            rank = row[0].value
+            fill = None
+            if rank == 1: fill = gold_fill
+            elif rank == 2: fill = silver_fill
+            elif rank <= 5: fill = bronze_fill
+            
+            for cell in row:
+                if fill: cell.fill = fill
+                cell.border = thin_border
+                cell.alignment = Alignment(vertical="center", horizontal="left" if cell.column in [3, 5, 6] else "center")
+
+        # Column Widths
+        widths = {'A':6, 'B':15, 'C':15, 'D':15, 'E':25, 'F':35, 'G':10, 'H':10, 'I':10, 'J':10, 'K':10, 'L':18}
+        for col, width in widths.items():
+            ws.column_dimensions[col].width = width
+
     output.seek(0)
-    
-    return send_file(output, as_attachment=True, download_name='iot_hackathon_final_results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(output, as_attachment=True, download_name='PRAKALP_2026_IoT_Hackathon_Final_Results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
