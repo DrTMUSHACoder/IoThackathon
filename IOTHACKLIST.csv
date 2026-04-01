@@ -1,0 +1,40 @@
+S.No,Batch NO,Name of The Student,Branch,Roll Number,Year,Mobile Number,Problem Statement
+1,PRAKALP/IOT-SPRINT/LIBRARY/001,M.Akshaya,CSE-(IOT),25ME1A4923,1st year ,8019932356,Smart Agriculture Soil Humidity and Nutrient Loop Control System using Arduino
+2,PRAKALP/IOT-SPRINT/LIBRARY/002,Ammalakanti Amulya ,CSE-(IOT),25ME1A4906,1st year ,8074073799,Smart Agricultural Grain Warehouse Heat Map and Aeration System using Arduino
+3,PRAKALP/IOT-SPRINT/LIBRARY/003,SHILPIKA ANAGANI ,CSE-(IOT),25ME1A4908,1st year ,9494606632,IoT Based Gas and Flame Detection Safety Alerting System using ESP32/WiFi Hub
+4,PRAKALP/IOT-SPRINT/LIBRARY/004,Katta pravallika,CSE-(IOT),25ME1A4925,1st year ,9988449795,Automated Industrial Area Safety and Hazard Lockout System using Arduino
+5,PRAKALP/IOT-SPRINT/LIBRARY/005,Ganisetty Monika krishna ,CSE-(IOT),25me1a4917,1st year ,9392589877,Home Security Anti-Theft Floor Mat Intrusion Detection System using Arduino
+6,PRAKALP/IOT-SPRINT/LIBRARY/006,Roshini,CSE-(IOT),25ME1A4946,1st year ,8142720087,IoT Based Smart Helmet Access and Safety Enforcement System using Arduino
+7,PRAKALP/IOT-SPRINT/LIBRARY/007,Neelagiri sai muneesh ,CSE-(IOT),25ME1A4940 ,1st year ,9908412395,Smart Corridor Energy Fan and Climate Controlling System using Arduino
+8,PRAKALP/IOT-SPRINT/LIBRARY/008,Priya Darshini,CSE-(IOT),25ME1A4955,1st year ,9390199864,WiFi Integrated Neighborhood Urban Heat Island Monitoring System using Raspberry Pi
+9,PRAKALP/IOT-SPRINT/LIBRARY/009,P.Sai Subhash,CSE-(IOT),25ME1A4941,1st year ,8125606143,Smart Refrigerator Energy Saving and Door-Open Warning System using Arduino
+10,PRAKALP/IOT-SPRINT/LIBRARY/010,Aishwarya,CSE(IOT),25ME1A4942,1st year ,9494316788,Automated Public Park Bushfire Detection and Alarm System using Arduino
+11,PRAKALP/IOT-SPRINT/LIBRARY/011,Gariganti Murali Krishna ,CSE-(IOT),24ME1A4921,2nd year , 80744 01263,IoT Based Automated Fire Fighting Robot using Arduino and Flame Sensors
+12,PRAKALP/IOT-SPRINT/LIBRARY/012,Ch ishwarya ,CSE-(IOT),24me1a4912,2nd year ,9121416755,WiFi Integrated Municipal Storage Tank Leakage Prediction System using Raspberry Pi
+13,PRAKALP/IOT-SPRINT/LIBRARY/013,K.Gnanamani,CSE-(IOT),24ME1A4931,2nd year ,8179070994,Bus Door Safe Zone Footboard Occupancy Monitoring System using Arduino
+14,PRAKALP/IOT-SPRINT/LIBRARY/014,B.Bhanu Sri Sarayu ,CSE-(IOT),24ME1A4908,2nd year ,9392492603,Cycle Blind Spot Warning and Side-Facing Cycle Bell Safety System using Arduino
+15,PRAKALP/IOT-SPRINT/LIBRARY/015,B. Veera naga suresh,CSE-(IOT),24ME1A4903,2nd year ,8341462754,Automated Wet and Dry Waste Auto-Segregation Bin System using Arduino
+16,PRAKALP/IOT-SPRINT/LIBRARY/016,Putti Daiva Paul,CSE-(IOT),24ME1A4948,2nd year ,9110313428,IoT Based School Classroom Presence and Monitoring System using Arduino/WiFi Link
+17,PRAKALP/IOT-SPRINT/LIBRARY/017,G.Neelima ,CSE-(IOT),24ME1A4924,2nd year ,8186002295,Automatic Door Lock/Unlock System using IR Sensing and Servo Control Hub
+18,PRAKALP/IOT-SPRINT/LIBRARY/018,Janga. Donald ,CSE-(IOT),24ME1A4927,2nd year ,9542137161,IoT Based Weather and Air Quality Monitoring System using DHT and WiFi Hub
+19,PRAKALP/IOT-SPRINT/LIBRARY/019,Allu Siva Malleswari ,CSE-(IOT),23ME1A4904 ,3rd year,7893595622,IoT Based Smart Air Quality Purifying and Fan Aeration System using Arduino
+20,PRAKALP/IOT-SPRINT/LIBRARY/020,Gunakala Devi Sowmya ,CSE-(IOT),23ME1A4917,3rd year,9121058542,IoT Based Room Temperature and Central Humidity Controlling System using Arduino
+21,PRAKALP/IOT-SPRINT/LIBRARY/021,TRIPARNA PRATYUSHA ,CSE-(IOT),23ME1A4960,3rd year,9110336365,IoT Based Smart Remote Irrigation Monitoring and Control System using Arduino
+22,PRAKALP/IOT-SPRINT/LIBRARY/022,Uppala Anjali Sushmitha ,CSE-(IOT),23ME1A4961,3rd year,9392712575,Energy Real-time Monitoring and Power Cut-off System using Arduino Relay Station
+23,PRAKALP/IOT-SPRINT/LIBRARY/023,Purapu Anusha ,CSE-(IOT),23ME1A4950,3rd year,8121351944,Public Transport Tracking and Arrival Notification System using WiFi Hub Hub
+24,PRAKALP/IOT-SPRINT/LIBRARY/024,Nalli. Rajeswari,CSE-(IOT),23ME1A4941,3rd year,8465948951,Bus Student Count Tracking and Overcrowding Alert System using Arduino
+25,PRAKALP/IOT-SPRINT/LIBRARY/025,K sriya prasanna ,CSE-(IOT),23ME1A4923 ,3rd year,8317658179,IoT Based Industrial Safety Monitoring and Hazard Alerting System using NodeMCU Hub
+26,PRAKALP/IOT-SPRINT/LIBRARY/026,V. Pragna sri valli,EEE,24ME1A0253,2nd year,7989915803,Anti-Theft Security and Sidewalk Navigation Assistive System using Arduino
+27,PRAKALP/IOT-SPRINT/LIBRARY/027,B.Geetha sri,EEE,24me1a0209,2nd year,6302336838,SMART Shopping Card: RFID/Proximity Based Item Billing System using Arduino
+28,PRAKALP/IOT-SPRINT/LIBRARY/028,S Babi,EEE,23ME1A0247,3rd year,6305144948,RFICS Toll Gate and Automated Vehicle Clearance System using Arduino
+29,PRAKALP/IOT-SPRINT/LIBRARY/029,G.Prem Kumar,EEE,23ME1A0208,3rd year,7416805301,Smart Parking Space Monitoring System using IR Sensors and WiFi Station
+30,PRAKALP/IOT-SPRINT/LIBRARY/030,T. Sunny ,EEE,23ME1A0251,3rd year,91820 58513,IV Line Air-Embolism Prevention and Flow Stopper Safety System using Arduino
+31,PRAKALP/IOT-SPRINT/LIBRARY/031,Saladi Mohan Ganesh ,EEE,23ME1A0244,3rd year,9959924979,Automated Smart Home Bathroom Aerated Occupancy Sensing System using Arduino
+32,PRAKALP/IOT-SPRINT/LIBRARY/032,Manepalli Venkata Siva Sri Harikrishna ,EEE,23ME1A0229 ,3rd year,72072 03738 ,IoT Based Air Smoke and Alcohol Detection Alerting System (MQ2/MQ3 Proxies)
+33,PRAKALP/IOT-SPRINT/LIBRARY/033,Angara Malika,EEE,23ME1A0203,3rd year,9550589009,Autonomous Firefront Mapping and Safety Rover Navigation Hub using Arduino
+34,PRAKALP/IOT-SPRINT/LIBRARY/034,Velagala Bindu ,EEE,23ME1A0255,3rd year,9391988356,IoT Based Patient Health Monitoring and Vital Tracking System using NodeMCU Station
+35,PRAKALP/IOT-SPRINT/LIBRARY/035,K.Likhitha Veni,EEE,24ME15A0203,3rd year,7093231791,Heart Disease Prediction using Wearable IoT Sensors and WiFi Link Hub
+36,PRAKALP/IOT-SPRINT/LIBRARY/036,Madeti Rani Vara Deepika ,EEE,23ME1A0224,3rd year,9676450372,EMIT (Emergency Medical Information Tracker): Alert System using Arduino
+37,PRAKALP/IOT-SPRINT/LIBRARY/037,Balusu Suhasya ,EEE,23ME1A0205,3rd year,7013474895,Heart Disease Detection and Prediction via Wearable Proximity Sensors Hub
+38,PRAKALP/IOT-SPRINT/LIBRARY/038,Ushajyothi ,CIVIL,23ME1A0106,3rd year,7680061229,Synced Multi-Room Fire Evacuation and Emergency Sync Alarm System using Arduino
+39,PRAKALP/IOT-SPRINT/LIBRARY/039,SK.Sohel,MECH,24ME1A0351,2nd year,6309531150,Automated Public Park Bushfire Detection and Alarm System using Arduino

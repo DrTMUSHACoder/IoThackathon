@@ -87,12 +87,12 @@ def initialize_db(path=None, wipe=False):
         cur.execute(schema)
         
         if wipe or path:
-            print(f"🗑️ Wiping teams table...")
+            print("Wiping teams table...")
             cur.execute("DELETE FROM teams;")
             c.commit() 
             
         if path:
-            print(f"📂 Initializing from: {path}")
+            print(f"Initializing from: {path}")
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if str(path).lower().endswith('.csv') else pd.read_excel(path)
             df.columns = [str(col).strip() for col in df.columns]
             
@@ -133,7 +133,7 @@ def initialize_db(path=None, wipe=False):
                     continue
             
             c.commit() # Final commit for inserts
-            print("✅ Import finished.")
+            print("Import finished.")
         else:
             c.commit() # Normal schema creation commit
     finally: c.close()
