@@ -173,7 +173,9 @@ def send_email(to, sub, body):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
             s.login(SENDER_EMAIL, SENDER_PASSWORD)
             s.send_message(msg)
-    except: pass
+        return True, None
+    except Exception as e:
+        return False, str(e)
 
 @app.route('/')
 def index(): return render_template('index.html', teams=get_teams())
