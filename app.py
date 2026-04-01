@@ -22,7 +22,7 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 SENDER_EMAIL = 'prakalp-hackathon@rcee.ac.in'
 SENDER_PASSWORD = 'zlbrpnprgnynuzso'
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD = 'password'
+ADMIN_PASSWORD = 'iotsprint@#1234'
 
 # Create necessary directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
