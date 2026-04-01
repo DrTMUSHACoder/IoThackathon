@@ -1,7 +1,8 @@
-<header class="global-navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; min-height: 72px; height: auto; gap: 20px; flex-wrap: wrap;">
+<style>.global-navbar::-webkit-scrollbar { display: none; }</style>
+<header class="global-navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px; height: 72px; gap: 10px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none;">
     
     <!-- 🚀 LEFT SECTION - Navigation (Strictly Centered Vertically) -->
-    <div style="display: flex; align-items: center; gap: 12px; flex: 1 1 auto; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
         <div style="display: flex; flex-direction: column; line-height: 1.1; margin-right: 12px; white-space: nowrap;">
             <span style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--primary-neon); letter-spacing: -0.5px;">⚡ PRAKALP 2026</span>
             <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8;">EVALUATION FRAMEWORK</span>
@@ -21,12 +22,12 @@
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="RCE Logo" onerror="this.style.display='none'" style="height: 48px; width: auto; object-fit: contain;">
         <div class="rce-brand-text" style="display: flex; flex-direction: column; white-space: nowrap; line-height: 1.1;">
             <span class="rce-title" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--accent-gold); margin: 0;">RAMACHANDRA</span>
-            <span class="rce-subtitle" style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.8;">College of Engineering <span style="color: #e74c3c; font-weight: bold;">Autonomous</span></span>
+            <span class="rce-subtitle" style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.8;">College of Engineering <span style="color: #e74c3c; font-weight: bold;">Auton.</span></span>
         </div>
     </a>
     
     <!-- 🛠️ RIGHT SECTION - Admin Actions (Aligned Right) -->
-    <div style="display: flex; align-items: center; gap: 8px; flex: 1 1 auto; justify-content: flex-end; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: flex-end; flex-shrink: 0;">
         
         {% if session.get('admin_logged_in') %}
             {% if request.endpoint == 'admin' %}
