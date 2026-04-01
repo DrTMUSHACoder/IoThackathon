@@ -6,7 +6,9 @@ import sqlite3
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from email.message import EmailMessage
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
+import time
+import io
 
 app = Flask(__name__)
 app.secret_key = 'prakalp-secure-iot-key-2026'
@@ -163,16 +165,20 @@ def get_teams():
 # ==============================
 # 📧 ENGINE & ROUTES
 # ==============================
-def send_email(to, sub, body):
+def send_email(to, sub, body, server=None):
     try:
         msg = EmailMessage()
         msg.set_content(body)
         msg['Subject'] = sub
         msg['From'] = f"PRAKALP 2026<{SENDER_EMAIL}>"
         msg['To'] = to.strip()
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
-            s.login(SENDER_EMAIL, SENDER_PASSWORD)
-            s.send_message(msg)
+
+        if server:
+            server.send_message(msg)
+        else:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
+                s.login(SENDER_EMAIL, SENDER_PASSWORD)
+                s.send_message(msg)
         return True, None
     except Exception as e:
         return False, str(e)
@@ -231,32 +237,36 @@ def upload_dispatch():
         if not rows:
              return redirect(url_for('admin') + f'?error=dispatch_failed&reason=The file appears to be empty.&tab=setup')
 
-        for r in rows:
-            def f(ks):
-                for k in ks:
-                    for rk in r.keys():
-                        if k.lower() in str(rk).lower(): return str(r[rk]).strip()
-                return ""
-            
-            raw_email = f(['Email', 'Mail', 'Address'])
-            e = raw_email.lower()
-            n = f(['Name', 'Student', 'Team', 'Member'])
-            pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial', 'Code'])
-            title = f(['Title', 'Problem', 'Statement', 'Topic', 'Description'])
-            
-            # --- DEBUG: Catch Column Mismatches ---
-            if not e:
-                 failed_list.append({'name': n or "Row Data", 'email': "NOT FOUND", 'reason': f"Could not find 'Email' column. Headers found: {list(r.keys())[:5]}"})
-                 continue
-                 
-            if e in sent_emails: continue
+        # 🚀 REUSE CONNECTION: Open once, send all
+        try:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                
+                for r in rows:
+                    def f(ks):
+                        for k in ks:
+                            for rk in r.keys():
+                                if k.lower() in str(rk).lower(): return str(r[rk]).strip()
+                        return ""
+                    
+                    raw_email = f(['Email', 'Mail', 'Address'])
+                    e = raw_email.lower()
+                    n = f(['Name', 'Student', 'Team', 'Member'])
+                    pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial', 'Code'])
+                    title = f(['Title', 'Problem', 'Statement', 'Topic', 'Description'])
+                    
+                    if not e:
+                         failed_list.append({'name': n or "Row Data", 'email': "NOT FOUND", 'reason': f"Could not find 'Email' column."})
+                         continue
+                         
+                    if e in sent_emails: continue
 
-            if not pid or not title:
-                 failed_list.append({'name': n, 'email': e, 'reason': f"Missing ID or Title. Check CSV Header names."})
-                 continue
+                    if not pid or not title:
+                         failed_list.append({'name': n, 'email': e, 'reason': f"Missing ID or Title."})
+                         continue
 
-            if EMAIL_REGEX.match(e):
-                body = f"""Dear Student, 
+                    if EMAIL_REGEX.match(e):
+                        body = f"""Dear Student, 
 Greetings from PRAKALP Hackathon Team!
 
 We are pleased to inform you that your problem statement has been officially assigned.
@@ -267,15 +277,19 @@ Request you to carefully go through the statement. Best of luck!
 
 Regards,
 PRAKALP Admin Team"""
-                
-                ok, err = send_email(e, f"PRAKALP Assignment: {pid}", body)
-                if ok:
-                    sent_emails.add(e)
-                    sent += 1
-                else:
-                    failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Connection Failed: {err}"})
-            else:
-                failed_list.append({'name': n, 'email': e, 'reason': f"Malformed email format: '{raw_email}'"})
+                        
+                        ok, err = send_email(e, f"PRAKALP Assignment: {pid}", body, server=server)
+                        if ok:
+                            sent_emails.add(e)
+                            sent += 1
+                            time.sleep(0.5) # ⏱️ Avoid triggering spam filters
+                        else:
+                            failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Error: {err}"})
+                    else:
+                        failed_list.append({'name': n, 'email': e, 'reason': f"Malformed email format: '{raw_email}'"})
+        except Exception as smtp_err:
+            print(f"❌ Critical SMTP failure: {smtp_err}")
+            return redirect(url_for('admin') + f'?error=dispatch_failed&reason=SMTP Auth/Server failure: {str(smtp_err)}&tab=setup')
         
         session['failed_emails'] = failed_list
         return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&tab=setup')
@@ -291,10 +305,7 @@ def finalize_registry():
     import time
     return redirect(url_for('admin') + f'?registered=1&tab=setup&t={int(time.time())}')
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, send_file
-import io
-
-# ... (Previous code remains the same)
+# ... (rest of the file handles Excel generation and rankings)
 
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
