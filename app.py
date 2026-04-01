@@ -17,8 +17,8 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 # ==============================
 # 🔐 CONFIG
 # ==============================
-SENDER_EMAIL = 'hod-cse-iot@rcee.ac.in'
-SENDER_PASSWORD = 'bichovbjfzkqypmh'
+SENDER_EMAIL = 'prakalp-hackathon@rcee.ac.in'
+SENDER_PASSWORD = 'zlbrpnprgnynuzso'
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'password'
 
