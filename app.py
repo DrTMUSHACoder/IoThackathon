@@ -226,6 +226,9 @@ def upload_dispatch():
         sent, failed_list = 0, []
         sent_emails = set()
 
+        if not rows:
+             return redirect(url_for('admin') + f'?error=dispatch_failed&reason=The file appears to be empty.&tab=setup')
+
         for r in rows:
             def f(ks):
                 for k in ks:
@@ -233,20 +236,21 @@ def upload_dispatch():
                         if k.lower() in str(rk).lower(): return str(r[rk]).strip()
                 return ""
             
-            e = f(['Email', 'Mail']).lower()
+            raw_email = f(['Email', 'Mail', 'Address'])
+            e = raw_email.lower()
             n = f(['Name', 'Student', 'Team', 'Member'])
-            pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial'])
-            title = f(['Title', 'Problem', 'Statement', 'Topic'])
+            pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial', 'Code'])
+            title = f(['Title', 'Problem', 'Statement', 'Topic', 'Description'])
             
+            # --- DEBUG: Catch Column Mismatches ---
             if not e:
-                 failed_list.append({'name': n or "Unknown Team", 'email': "MISSING", 'reason': "No email address found in CSV row."})
+                 failed_list.append({'name': n or "Row Data", 'email': "NOT FOUND", 'reason': f"Could not find 'Email' column. Headers found: {list(r.keys())[:5]}"})
                  continue
                  
-            if e in sent_emails: 
-                 continue
+            if e in sent_emails: continue
 
             if not pid or not title:
-                 failed_list.append({'name': n, 'email': e, 'reason': f"Missing Project ID ('{pid}') or Statement ('{title}'). Check CSV headers."})
+                 failed_list.append({'name': n, 'email': e, 'reason': f"Missing ID or Title. Check CSV Header names."})
                  continue
 
             if EMAIL_REGEX.match(e):
@@ -257,9 +261,8 @@ We are pleased to inform you that your problem statement has been officially ass
 Hackathon Project ID: {pid}
 Problem Statement: {title}
 
-Request you to carefully go through the problem statement and start working on your project. Consistency with guidelines and timelines is essential.
+Request you to carefully go through the statement. Best of luck!
 
-Wishing you all the best!
 Regards,
 PRAKALP Admin Team"""
                 
@@ -268,9 +271,9 @@ PRAKALP Admin Team"""
                     sent_emails.add(e)
                     sent += 1
                 else:
-                    failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Error: {err}"})
+                    failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Connection Failed: {err}"})
             else:
-                failed_list.append({'name': n, 'email': e, 'reason': "Invalid email format (check for spaces/special chars)."})
+                failed_list.append({'name': n, 'email': e, 'reason': f"Malformed email format: '{raw_email}'"})
         
         session['failed_emails'] = failed_list
         return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&tab=setup')
