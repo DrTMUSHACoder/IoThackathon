@@ -1,7 +1,7 @@
-<header class="global-navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px; height: 72px; gap: 20px;">
+<header class="global-navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; min-height: 72px; height: auto; gap: 20px; flex-wrap: wrap;">
     
     <!-- 🚀 LEFT SECTION - Navigation (Strictly Centered Vertically) -->
-    <div style="display: flex; align-items: center; gap: 12px; flex: 0 1 auto; overflow-x: auto;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1 1 auto; flex-wrap: wrap;">
         <div style="display: flex; flex-direction: column; line-height: 1.1; margin-right: 12px; white-space: nowrap;">
             <span style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--primary-neon); letter-spacing: -0.5px;">⚡ PRAKALP 2026</span>
             <span style="font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8;">EVALUATION FRAMEWORK</span>
@@ -26,7 +26,7 @@
     </a>
     
     <!-- 🛠️ RIGHT SECTION - Admin Actions (Aligned Right) -->
-    <div style="display: flex; align-items: center; gap: 8px; flex: 0 1 auto; justify-content: flex-end; overflow-x: auto; padding-right: 5px;">
+    <div style="display: flex; align-items: center; gap: 8px; flex: 1 1 auto; justify-content: flex-end; flex-wrap: wrap;">
         
         {% if session.get('admin_logged_in') %}
             {% if request.endpoint == 'admin' %}
