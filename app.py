@@ -176,14 +176,15 @@ def send_email(to, sub, body):
         msg['Subject'] = sub
         msg['From'] = f"PRAKALP 2026 Admin <{SENDER_EMAIL}>"
         msg['To'] = to.strip()
-        # 🚀 Gmail SMTP_SSL on Port 465
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as s:
+        # 🚀 Port 587 with STARTTLS is generally more compatible with cloud hosts
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=15) as s:
+            s.starttls()
             s.login(SENDER_EMAIL, SENDER_PASSWORD)
             s.send_message(msg)
         return True, "Sent"
     except Exception as e:
         err = str(e)
-        if "Authentication failed" in err: return False, "Auth Failure: Check App Password"
+        if "Authentication failed" in err: return False, "Authentication Failure: Check App Password"
         if "quota" in err.lower(): return False, "Gmail Daily Quota Exceeded"
         return False, err
 
