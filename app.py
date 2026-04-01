@@ -71,11 +71,17 @@ SCORING_META = {
     'R4': {'title': 'Round 4 – Final Pitch', 'desc': 'Live Demo & Q&A', 'weight': '30%', 'criteria': [{'field': 'r4_innovation', 'label': 'Innovation', 'max': 10}, {'field': 'r4_workingprototype', 'label': 'Working Prototype', 'max': 15}, {'field': 'r4_realtimeimpact', 'label': 'Real-Time Impact', 'max': 10}, {'field': 'r4_presentationskills', 'label': 'Presentation Skills', 'max': 5}, {'field': 'r4_qahandling', 'label': 'Q&A Handling', 'max': 10}]}
 }
 
-def initialize_db(path=None):
+def initialize_db(path=None, wipe=False):
     c = get_db_connection()
     if not c: return
     try:
         cur = c.cursor()
+        
+        # ⚠️ IF WIPE REQUESTED: Atomic Clear
+        if wipe:
+            cur.execute("DROP TABLE IF EXISTS teams;")
+            c.commit()
+
         schema = """CREATE TABLE IF NOT EXISTS teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
         r1_innovation NUMERIC DEFAULT 0, r1_problemrelevance NUMERIC DEFAULT 0, r1_techfeasibility NUMERIC DEFAULT 0, r1_claritypresentation NUMERIC DEFAULT 0,
         r2_feasibilityvalidation NUMERIC DEFAULT 0, r2_systemdesignlogic NUMERIC DEFAULT 0, r2_demoquality NUMERIC DEFAULT 0, r2_technicalunderstanding NUMERIC DEFAULT 0,
@@ -85,12 +91,12 @@ def initialize_db(path=None):
         cur.execute(schema)
         
         if path:
-            print(f"📂 Initializing from: {path}")
             cur.execute("DELETE FROM teams;")
-            c.commit() # 🔥 Immediate commit of the wipe
+            c.commit()
             
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if str(path).lower().endswith('.csv') else pd.read_excel(path)
             df.columns = [str(col).strip() for col in df.columns]
+            # ... (Rest of registry import logic remains the same)
             
             for r in df.to_dict(orient='records'):
                 try:
@@ -266,7 +272,7 @@ PRAKALP Admin Team"""
 def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     if os.path.exists(REGISTRY_PATH):
-        initialize_db(REGISTRY_PATH)
+        initialize_db(REGISTRY_PATH, wipe=True)
     import time
     return redirect(url_for('admin') + f'?registered=1&tab=setup&t={int(time.time())}')
 
@@ -338,6 +344,7 @@ def download_results():
                 'R3P1_Total': 'R3P1 (20%)',
                 'R3P2_Total': 'R3P2 (20%)',
                 'R4_Total': 'R4 (30%)',
+                'Raw_Total': 'Grand Total Marks',
                 'Weighted_Total': 'Weighted Total (%)'
             }
             
@@ -375,7 +382,7 @@ def download_results():
                     cell.border = thin_border
                     cell.alignment = Alignment(vertical="center", horizontal="left" if cell.column in [3, 5, 6] else "center")
 
-            widths = {'A':6, 'B':15, 'C':15, 'D':15, 'E':25, 'F':35}
+            widths = {'A':6, 'B':15, 'C':15, 'D':15, 'E':25, 'F':35, 'G':12, 'H':12, 'I':12, 'J':12, 'K':12, 'L':18}
             for col, width in widths.items():
                 ws.column_dimensions[col].width = width
 
@@ -385,13 +392,10 @@ def download_results():
     output.seek(0)
     return send_file(output, as_attachment=True, download_name='PRAKALP_2026_IoT_Hackathon_Final_Results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-    output.seek(0)
-    return send_file(output, as_attachment=True, download_name='PRAKALP_2026_IoT_Hackathon_Final_Results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    initialize_db()
+    initialize_db(wipe=True)
     return redirect(url_for('admin') + '?reset=1&tab=setup')
 
 if __name__ == '__main__':
