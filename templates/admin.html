@@ -11,207 +11,778 @@
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <style>
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+        /* ─── Global Scroller / Clean Forms ─── */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* ─── Admin Layout ─── */
         body { padding-top: 0; }
-        .admin-header { position: sticky; top: 76px; z-index: 200; background: rgba(11, 14, 20, 0.96); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-        .round-tabs { display: flex; gap: 8px; padding: 24px 32px 0; }
-        .round-tab { padding: 10px 20px; border-radius: 10px 10px 0 0; border: 1px solid var(--glass-border); border-bottom: none; background: var(--surface-dark); color: var(--text-secondary); cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .round-tab.active { background: var(--glass-bg); color: var(--primary-neon); border-color: var(--primary-neon); box-shadow: 0 -4px 16px color-mix(in srgb, var(--primary-neon) 15%, transparent); }
-        .round-panel { display: none; margin: 0 32px 40px; border: 1px solid var(--glass-border); border-radius: 0 16px 16px 16px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); overflow: hidden; }
+
+        .admin-header {
+            position: sticky;
+            top: 76px;
+            z-index: 200;
+            background: rgba(11, 14, 20, 0.96);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .admin-header-left { display: flex; align-items: center; gap: 20px; }
+        .admin-header-right { display: flex; align-items: center; gap: 12px; }
+
+        /* ─── Round Tabs ─── */
+        .round-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 24px 32px 0;
+        }
+
+        .round-tab {
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            border: 1px solid var(--glass-border);
+            border-bottom: none;
+            background: var(--surface-dark);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .round-tab .tab-weight {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        .round-tab:hover { background: #1c2128; color: var(--text-primary); }
+
+        .round-tab.active {
+            background: var(--glass-bg);
+            color: var(--primary-neon);
+            border-color: var(--primary-neon);
+            box-shadow: 0 -4px 16px color-mix(in srgb, var(--primary-neon) 15%, transparent);
+        }
+
+        .round-tab.active .tab-weight { color: var(--primary-neon); opacity: 0.7; }
+
+        /* ─── Round Panel ─── */
+        .round-panel {
+            display: none;
+            margin: 0 32px 40px;
+            border: 1px solid var(--glass-border);
+            border-radius: 0 16px 16px 16px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            overflow: hidden;
+        }
+
         .round-panel.active { display: block; }
-        .round-banner { background: linear-gradient(135deg, color-mix(in srgb, var(--primary-neon) 8%, transparent), color-mix(in srgb, var(--secondary-neon) 6%, transparent)); border-bottom: 1px solid var(--glass-border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; }
-        .table-responsive-wrapper { width: 100%; height: calc(100vh - 340px); min-height: 420px; overflow: auto; position: relative; border-radius: var(--radius-md); border: 1px solid var(--glass-border); }
-        .scoring-table { width: 100%; border-collapse: collapse; }
-        .scoring-table th { position: sticky; top: 0; z-index: 10; background: #111418; padding: 14px 16px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); font-weight: 600; border-bottom: 2px solid var(--glass-border); white-space: nowrap; }
-        .scoring-table td { padding: 12px 16px; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        .criteria-input { width: 68px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--glass-border); color: var(--text-primary); padding: 8px 10px; border-radius: 8px; text-align: center; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; transition: all 0.2s; }
-        .criteria-input:focus { outline: none; border-color: var(--primary-neon); background: color-mix(in srgb, var(--primary-neon) 7%, transparent); }
-        .save-toast { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #00C853, #64DD17); color: #000; padding: 14px 28px; border-radius: 12px; font-weight: 700; z-index: 500; transform: translateY(80px); opacity: 0; transition: all 0.4s; }
+
+        /* ─── Round Info Banner ─── */
+        .round-banner {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--primary-neon) 8%, transparent), color-mix(in srgb, var(--secondary-neon) 6%, transparent));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .round-banner h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; margin-bottom: 4px; }
+        .round-banner p { color: var(--text-secondary); font-size: 0.82rem; }
+
+        .round-weight-badge {
+            padding: 6px 18px;
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+            color: var(--bg-dark);
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        /* ─── Scoring Table ─── */
+        .table-responsive-wrapper {
+            width: 100%;
+            height: calc(100vh - 340px);
+            min-height: 420px;
+            overflow: auto;
+            position: relative;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--glass-border);
+        }
+
+        .scoring-table th.sticky-col {
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 30;
+            background: #111418;
+            border-right: 2px solid var(--primary-neon);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+
+        .scoring-table td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            background: #15191e;
+            border-right: 2px solid var(--primary-neon);
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .scoring-table thead tr {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .scoring-table th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #111418; /* ensure solid back to obscure body scroll */
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--glass-border);
+            white-space: nowrap;
+        }
+
+        .scoring-table th .max-hint {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--primary-neon);
+            opacity: 0.7;
+            letter-spacing: 0;
+            text-transform: none;
+            margin-top: 2px;
+        }
+
+        .scoring-table tbody tr {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+        }
+
+        .scoring-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+        .scoring-table tbody tr:last-child { border-bottom: none; }
+
+        .scoring-table td {
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+
+        /* ─── Criteria Input ─── */
+        .criteria-input {
+            width: 68px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 8px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .criteria-input:focus {
+            outline: none;
+            border-color: var(--primary-neon);
+            background: color-mix(in srgb, var(--primary-neon) 7%, transparent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-neon) 12%, transparent);
+        }
+
+        .criteria-input.over-limit {
+            border-color: var(--error) !important;
+            background: rgba(248, 81, 73, 0.1) !important;
+        }
+
+        /* ─── Live Round Total ─── */
+        .round-total-cell {
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            min-width: 80px;
+        }
+
+        .round-total-display {
+            color: var(--primary-neon);
+            transition: all 0.2s;
+        }
+
+        .round-total-display.over { color: var(--error); }
+
+        /* ─── Team Info Cell ─── */
+        .team-id {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            min-width: 50px;
+        }
+
+        .team-name { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
+        .team-project { font-size: 0.73rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+
+        /* ─── Save Toast ─── */
+        .save-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #00C853, #64DD17);
+            color: #000;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            z-index: 500;
+            box-shadow: 0 8px 30px rgba(0,200,83,0.4);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
         .save-toast.show { transform: translateY(0); opacity: 1; }
-        #loadingOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+
+
+
+        /* ─── Step 2 locked state ─── */
+        .step2-locked { opacity: 0.45; pointer-events: none; filter: saturate(0.3); }
+
+        /* ─── Loading Overlay ─── */
+        #loadingOverlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
         #loadingOverlay.show { display: flex; }
-        #successPopup { display: none; position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+        .spinner-ring {
+            width: 72px; height: 72px;
+            border: 6px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary-neon);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-dots span {
+            display: inline-block;
+            animation: blink 1.4s infinite both;
+            font-size: 1.6rem;
+            color: var(--primary-neon);
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+        /* ─── Success Popup Modal ─── */
+        #successPopup {
+            display: none;
+            position: fixed; inset: 0; z-index: 9998;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+        }
         #successPopup.show { display: flex; }
-        .popup-card { background: #0d1b2a; border-radius: 20px; padding: 40px; text-align: center; border: 1px solid var(--primary-neon); max-width: 480px; }
-        .step2-locked { opacity: 0.45; pointer-events: none; filter: grayscale(1); }
-        .sticky-col { position: sticky; left: 0; z-index: 20; background: #111418 !important; border-right: 2px solid var(--primary-neon); }
+        .popup-card {
+            background: linear-gradient(135deg, #0d1b2a, #0a1628);
+            border-radius: 20px;
+            padding: 48px 56px;
+            text-align: center;
+            border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 60px color-mix(in srgb, var(--primary-neon) 25%, transparent);
+            max-width: 480px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .popup-icon { font-size: 4rem; margin-bottom: 16px; }
+        .popup-title { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--primary-neon); margin-bottom: 8px; }
+        .popup-sub { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
+        .popup-close {
+            margin-top: 28px;
+            padding: 10px 32px;
+            background: var(--primary-neon);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+        .popup-close:hover { opacity: 0.8; }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 900px) {
+            .admin-header { flex-wrap: wrap; }
+            .round-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .scoring-table { font-size: 0.8rem; }
+            .criteria-input { width: 54px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- 🌍 Global Navbar 🌍 -->
     {% include 'header.html' %}
 
+    <!-- Loading Overlay -->
     <div id="loadingOverlay">
-        <div style="width:72px; height:72px; border:6px solid rgba(255,255,255,0.1); border-top-color:var(--primary-neon); border-radius:50%; animation:spin 0.9s linear infinite;"></div>
-        <p id="loadingText" style="color:#fff; font-family:'Outfit',sans-serif; font-size:1.2rem;">Processing Data...</p>
+        <div class="spinner-ring"></div>
+        <p id="loadingText" style="color:#fff; font-family:'Outfit',sans-serif; font-size:1.2rem; font-weight:600;">Sending emails...</p>
+        <div class="loading-dots"><span>●</span><span>●</span><span>●</span></div>
     </div>
-    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 
+    <!-- Success Popup -->
     <div id="successPopup">
         <div class="popup-card">
-            <div id="popupIcon" style="font-size:4rem; margin-bottom:16px;">✅</div>
-            <div id="popupTitle" style="color:var(--primary-neon); font-size:1.6rem; font-weight:800; margin-bottom:8px;">Success</div>
-            <div id="popupSub" style="color:var(--text-secondary); line-height:1.6;">Operation completed.</div>
-            <button onclick="closePopup()" style="margin-top:24px; padding:10px 32px; background:var(--primary-neon); border:none; border-radius:8px; cursor:pointer; font-weight:700;">OK</button>
+            <div class="popup-icon" id="popupIcon">✅</div>
+            <div class="popup-title" id="popupTitle">Success!</div>
+            <div class="popup-sub" id="popupSub">Operation completed successfully.</div>
+            <button class="popup-close" onclick="closePopup()">OK, Got it!</button>
         </div>
     </div>
 
-    <div class="round-tabs" style="margin-top:20px;">
-        <button class="round-tab" id="tab-setup" onclick="switchRound('setup')">⚙️ Setup</button>
+
+    <!-- ═══ Round Tabs ═══ -->
+    <div class="round-tabs">
+        <button class="round-tab" id="tab-setup" onclick="switchRound('setup')">
+            ⚙️ Setup & Registration
+        </button>
         {% for rkey, rmeta in meta.items() %}
-        <button class="round-tab {% if loop.first %}active{% endif %}" id="tab-{{ rkey }}" onclick="switchRound('{{ rkey }}')">
-            {{ rkey }} <span style="font-size:0.7rem; opacity:0.6;">({{ rmeta.weight }})</span>
+        <button class="round-tab {% if loop.first %}active{% endif %}"
+                id="tab-{{ rkey }}"
+                onclick="switchRound('{{ rkey }}')">
+            {% if rkey == 'R3P1' %}Round 3 P1
+            {% elif rkey == 'R3P2' %}Round 3 P2
+            {% else %}{{ rmeta.title.split('–')[0].strip() }}{% endif %}
+            <span class="tab-weight">{{ rmeta.weight }}</span>
         </button>
         {% endfor %}
     </div>
 
-    <div class="round-panel" id="panel-setup" style="max-width: 800px; margin: 20px auto;">
-        <div style="padding: 24px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid var(--glass-border);">
-            <h3 style="color:var(--primary-neon); margin-bottom:16px;">Tournament Setup</h3>
-            
-            <div style="border:1px solid var(--accent-gold); padding:20px; border-radius:12px; margin-bottom:20px;">
-                <h4 style="color:var(--accent-gold);">Step 1: Broadcast Assignments</h4>
+    <!-- ═══ Main Setup Panel ═══ -->
+    <div class="round-panel" id="panel-setup" style="max-width: 800px; margin: 0 auto; margin-bottom: 24px;">
+        <div class="round-banner" style="background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%); display: block; text-align: center;">
+            <h3 style="color: var(--primary-neon); margin-bottom: 8px;">Hackathon Registry Setup</h3>
+            <p>Upload a Teams Registry Excel/CSV file to organically assign Project IDs and safely initialize the tournament.</p>
+        </div>
+        <div class="glass-card" style="padding: 24px;">
+            <!-- 🔥 STEP 1: DISPATCH & BROADCAST -->
+            <div style="border: 1px solid var(--accent-gold); padding: 20px; border-radius: 12px; margin-bottom: 24px; background: rgba(255, 183, 77, 0.05);">
+                <h4 style="color: var(--accent-gold); margin-bottom: 12px; font-family: 'Outfit', sans-serif;">Step 1: Broadcast Project Assignments</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                    Upload your <strong>PSList.csv</strong>. The system will instantaneously send all Project ID emails to the students found in the file.
+                </p>
                 <form action="/upload_dispatch" method="post" enctype="multipart/form-data">
-                    <input type="file" name="registry_file" accept=".csv,.xlsx" required style="margin: 12px 0; display:block;">
-                    <button type="submit" style="width:100%; padding:12px; background:var(--accent-gold); border:none; border-radius:8px; font-weight:800; cursor:pointer;">🚀 BROADCAST EMAILS</button>
+                    <input type="file" name="registry_file" accept=".csv,.xlsx" required 
+                           style="border: 1px dashed var(--accent-gold); padding: 12px; border-radius: 8px; background: rgba(0,0,0,0.2); color: var(--text-secondary); width: 100%; margin-bottom: 15px;">
+                    <button type="submit" class="btn-primary" 
+                            style="width: 100%; justify-content: center; background: var(--accent-gold); color: #000; font-weight: 800;">
+                        🚀 STEP 1: UPLOAD & DISPATCH EMAILS
+                    </button>
                 </form>
             </div>
 
-            <div style="border:1px solid var(--primary-neon); padding:20px; border-radius:12px;" class="{% if not request.args.get('step1_done') %}step2-locked{% endif %}">
-                <h4 style="color:var(--primary-neon);">Step 2: Initialize Registry</h4>
-                <form action="/finalize_registry" method="post" onsubmit="return confirm('⚠️ WIPE ALL SCORES and re-initialize? This is irreversible.')">
-                    <button type="submit" style="width:100%; padding:12px; background:var(--primary-neon); border:none; border-radius:8px; font-weight:800; cursor:pointer;">📂 FINALIZE REGISTRY</button>
+            <!-- 📁 STEP 2: FINALIZE & INITIALIZE DASHBOARD -->
+            <div style="border: 1px solid var(--primary-neon); padding: 20px; border-radius: 12px; margin-bottom: 24px; background: rgba(0, 243, 255, 0.05);"
+                 class="{% if not request.args.get('step1_done') %}step2-locked{% endif %}">
+                <h4 style="color: var(--primary-neon); margin-bottom: 12px; font-family: 'Outfit', sans-serif;">Step 2: Initialize Evaluation Dashboard</h4>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+                    Once your emails are successful, click here to formally anchor the teams into the scoring dashboard.
+                </p>
+                <form action="/finalize_registry" method="post" onsubmit="return confirm('⚠️ CRITICAL WARNING: This will DELETE all current scores and re-initialize the entire tournament from the CSV. Are you absolutely sure?')">
+                    <button type="submit" class="btn-primary" 
+                            style="width: 100%; justify-content: center; background: var(--primary-neon); color: #000; font-weight: 800;"
+                            {% if not request.args.get('step1_done') %}disabled title="Complete Step 1 First"{% endif %}>
+                        📂 STEP 2: FINALIZE TEAM REGISTRY
+                    </button>
                 </form>
             </div>
-            
-            <form action="/reset_db" method="post" style="margin-top:20px;" onsubmit="return confirm('🚨 DANGER: Wipe EVERYTHING?')">
-                <button type="submit" style="width:100%; padding:10px; background:#444; color:#ff4444; border:1px solid #ff4444; border-radius:8px; cursor:pointer;">💣 FULL SYSTEM RESET</button>
-            </form>
+
         </div>
     </div>
 
+    <!-- ═══ Main Scoring Form ═══ -->
     <form id="scoringForm" action="/update_scores" method="post">
+
         {% for rkey, rmeta in meta.items() %}
+
+        <!-- Panel: {{ rkey }} -->
         <div class="round-panel {% if loop.first %}active{% endif %}" id="panel-{{ rkey }}">
+
+            <!-- Round Banner -->
             <div class="round-banner">
-                <h3>{{ rmeta.title }} <span style="opacity:0.6; font-size:0.9rem;">({{ rmeta.weight }})</span></h3>
-                <span style="color:var(--text-secondary); font-size:0.8rem;">Live Database Synchronization Active</span>
+                <div>
+                    <h3>{{ rmeta.title }}</h3>
+                    <p>🕐 {{ rmeta.desc }}</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Weightage of Round:</span>
+                    <div class="round-weight-badge" style="margin:0;">{{ rmeta.weight }}</div>
+                </div>
             </div>
 
+            <!-- Scoring Table -->
             <div class="table-responsive-wrapper">
-                <table class="scoring-table">
-                    <thead>
-                        <tr>
-                            <th class="sticky-col">Team / Student</th>
-                            {% for c in rmeta.criteria %}<th>{{ c.label }} <br><span style="font-size:0.6rem; opacity:0.5;">Max {{ c.max }}</span></th>{% endfor %}
-                            <th style="color:var(--primary-neon);">Total</th>
-                            <th style="color:var(--accent-gold);">Cumulative</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for team in teams %}
-                        {% set sno = team['TeamID'] %}
-                        <tr>
-                            <td class="sticky-col">
-                                <div style="font-weight:700; color:var(--primary-neon);">{{ team.TeamName }}</div>
-                                <div style="font-size:0.75rem; opacity:0.7;">ID: {{ sno }} | Project: {{ team.ProjectID }}</div>
-                            </td>
-                            {% for c in rmeta.criteria %}
-                            <td>
-                                <input type="number" id="inp-{{ c.field }}-{{ sno }}" name="{{ c.field }}_{{ sno }}" 
-                                       value="{{ team[c.field]|default(0)|int }}" class="criteria-input" 
-                                       data-max="{{ c.max }}" data-round="{{ rkey }}" data-team="{{ sno }}">
-                            </td>
-                            {% endfor %}
-                            <td><span id="total-{{ rkey }}-{{ sno }}" style="font-weight:800;">{{ team[rkey ~ '_Total']|default(0)|int }}</span></td>
-                            <td><span class="cum-{{ sno }}" style="font-weight:800; color:var(--accent-gold);">{{ team.Raw_Total|default(0)|int }}</span></td>
-                        </tr>
+            <table class="scoring-table">
+                <thead>
+                    <tr>
+                        <th class="sticky-col" style="min-width: 320px;">Team Profile</th>
+                        {% for c in rmeta.criteria %}
+                        <th style="text-align:center;">
+                            {{ c.label }}
+                            <span class="max-hint">/ {{ c.max }}</span>
+                        </th>
                         {% endfor %}
-                    </tbody>
-                </table>
+                        <th style="text-align:center; width:90px;">
+                            Total
+                            <span class="max-hint">/ 50</span>
+                        </th>
+                        <th style="text-align:center; width:100px; color: var(--accent-gold);">
+                            Cumulative
+                            <span style="display:block; font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">/ 250</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                    {% set sno = team['TeamID'] %}
+                    <tr>
+                        <td class="sticky-col">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div class="team-id" style="font-size: 0.85rem; padding: 6px 10px; background: rgba(255,255,255,0.05); border-radius: 4px; border: 1px solid var(--glass-border); color: var(--text-secondary); white-space: nowrap;">{{ sno }}</div>
+                                <div>
+                                    <div class="team-name" style="font-weight: 700; color: var(--primary-neon); font-size: 1.05rem;">{{ team.TeamName }}</div>
+                                    <div class="team-project" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.3;">
+                                        <span style="font-weight: 700; color: var(--accent-gold);">[{{ team.ProjectID }}]</span>
+                                        {{ team.ProjectTitle }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        {% for c in rmeta.criteria %}
+                        <td style="text-align:center;">
+                            <input
+                                type="number"
+                                id="inp-{{ c.field }}-{{ sno }}"
+                                name="{{ c.field }}_{{ sno }}"
+                                value="{{ team[c.field]|default(0)|int }}"
+                                class="criteria-input"
+                                min="0"
+                                max="{{ c.max }}"
+                                data-max="{{ c.max }}"
+                                data-round="{{ rkey }}"
+                                data-team="{{ sno }}"
+                                oninput="updateRowTotal('{{ rkey }}', '{{ sno }}')"
+                            >
+                        </td>
+                        {% endfor %}
+
+                        <!-- Live Row Total -->
+                        <td class="round-total-cell">
+                            <span class="round-total-display" id="total-{{ rkey }}-{{ sno }}">
+                                {{ team[rkey ~ '_Total']|default(0)|int }}
+                            </span>
+                        </td>
+                        <!-- Live Cumulative Total -->
+                        <td style="text-align:center; vertical-align:middle; background: color-mix(in srgb, var(--accent-gold) 5%, transparent); border-left: 1px solid var(--glass-border);">
+                            <span class="cum-{{ sno }}" style="font-weight: 800; color: var(--accent-gold); font-size: 1.15rem;">
+                                {{ team.Raw_Total|default(0)|int }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             </div>
-        </div>
+        </div> <!-- ✅ Closes .round-panel geometrically preventing recursive nesting failure -->
+
         {% endfor %}
+
+        {% if request.args.get('emailed') %}
+            {% set failed_count = request.args.get('failed', '0')|int %}
+            {% set sent_count = request.args.get('sent', '0')|int %}
+            {% if failed_count == 0 %}
+                <div class="banner" style="background: #1b5e20; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 32px; border: 1px solid #4caf50;">
+                    ✅ <strong>Broadcast Complete!</strong> All <strong>{{ sent_count }}</strong> emails delivered successfully. No failures.
+                </div>
+            {% else %}
+                <div class="banner" style="background: #1b5e20; color: #fff; padding: 12px 15px; border-radius: 8px 8px 0 0; margin: 20px 32px 0; border: 1px solid #4caf50;">
+                    ✅ <strong>{{ sent_count }} Emails Sent</strong> &nbsp;|&nbsp; ❌ <strong>{{ failed_count }} Failed</strong>
+                </div>
+                <div style="background: #1a0a0a; border: 1px solid #f44336; border-top: none; border-radius: 0 0 8px 8px; margin: 0 32px 20px; padding: 16px;">
+                    <p style="color: #ff5252; font-weight: 700; margin-bottom: 12px;">⚠️ The following emails could NOT be delivered:</p>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,82,82,0.3);">
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">#</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Student Name</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Email Address</th>
+                                <th style="text-align:left; padding:8px; color:#ff8a80;">Failure Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in session.get('failed_emails', []) %}
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                                <td style="padding:8px; color:#aaa;">{{ loop.index }}</td>
+                                <td style="padding:8px; color:#fff; font-weight:600;">{{ f.name }}</td>
+                                <td style="padding:8px; color:#90caf9; font-family:monospace;">{{ f.email }}</td>
+                                <td style="padding:8px; color:#ff5252;">🔴 {{ f.reason }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if request.args.get('registered') %}
+            <div class="banner" style="background: #004d40; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #1de9b6; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+                ✅ ✨ <strong>SUCCESSFULLY INITIALIZED!</strong>
+                <br><span style="font-size: 0.95rem; opacity: 0.9;">All teams from your PSList are now formally registered and visible on the scoring dashboard.</span>
+            </div>
+        {% endif %}
+
+        {% if request.args.get('error') == 'file_locked' %}
+            <div class="banner" style="background: #b71c1c; color: #fff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #f44336;">
+                ⚠️ <strong>PERMISSION DENIED!</strong> Your spreadsheet is OPEN IN EXCEL.
+                <br><span style="font-size: 0.9rem; opacity: 0.9;">Please CLOSE ALL EXCEL WINDOWS and try resetting again.</span>
+            </div>
+        {% endif %}
+
+        {% if request.args.get('reset') %}
+            <div class="banner" style="background: #e65100; color: #fff; padding: 12px; border-radius: 8px; margin: 20px 0;">
+                🗑️ <strong>Tournament Reset Complete!</strong> All entries and scores have been wiped.
+            </div>
+        {% endif %}
+
     </form>
 
-    <div class="save-toast" id="saveToast">✅ Synchronized</div>
+    <!-- ═══ Save Toast ═══ -->
+    <div class="save-toast" id="saveToast">✅ Scores saved successfully!</div>
 
     <script>
+        // ─── Criteria definitions from Jinja (field → max) ───
         const CRITERIA = {
             {% for rkey, rmeta in meta.items() %}
-            '{{ rkey }}': [{% for c in rmeta.criteria %}{ field: '{{ c.field }}', max: {{ c.max }}, label: '{{ c.label|replace("'","\\'") }}' },{% endfor %}],
+            '{{ rkey }}': [
+                {% for c in rmeta.criteria %}
+                { field: '{{ c.field }}', max: {{ c.max }} },
+                {% endfor %}
+            ],
             {% endfor %}
         };
 
-        let lock = false;
-        async function sync(silent = true) {
-            if (lock) return;
-            const res = await fetch('/update_scores', { method: 'POST', body: new FormData(document.getElementById('scoringForm')) });
-            if (res.ok && !silent) {
-                const t = document.getElementById('saveToast');
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 2000);
+        // ─── Refactored saveScores to use FETCH for async background sync ───
+        let saveTimeout;
+        async function saveScores(isAuto = false) {
+            const btn = document.getElementById('saveBtn');
+            const toast = document.getElementById('saveToast');
+            
+            if (!isAuto) {
+                btn.textContent = '⏳ Manual Sync...';
+                btn.disabled = true;
+            }
+
+            // Check for over-limit inputs before saving
+            const overLimitInputs = document.querySelectorAll('.criteria-input.over-limit');
+            if (overLimitInputs.length > 0) {
+                if (!isAuto) {
+                    alert(`⚠️ ${overLimitInputs.length} field(s) exceed maximum marks. Correct before saving.`);
+                    btn.textContent = '💾 Always Save in Database';
+                    btn.disabled = false;
+                }
+                return;
+            }
+
+            try {
+                const formData = new FormData(document.getElementById('scoringForm'));
+                const response = await fetch('/update_scores', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    toast.textContent = isAuto ? '🔄 Auto-Sync Complete (Live)' : '✅ Database Mathematically Locked!';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), isAuto ? 1500 : 3000);
+                }
+            } catch (err) {
+                console.error('❌ Sync Error:', err);
+            } finally {
+                if (!isAuto) {
+                    btn.textContent = '💾 Always Save in Database';
+                    btn.disabled = false;
+                }
             }
         }
 
-        let timer;
-        function debouncedSync() { clearTimeout(timer); timer = setTimeout(() => sync(true), 2000); }
-
-        function switchRound(rkey) {
-            if (!lock && rkey !== 'setup') sync(true);
-            document.querySelectorAll('.round-tab, .round-panel').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + rkey).classList.add('active');
-            document.getElementById('panel-' + rkey).classList.add('active');
-            const url = new URL(window.location); url.searchParams.set('tab', rkey); window.history.replaceState({}, '', url);
+        // Debounced save for live input
+        function debouncedSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => saveScores(true), 2500); 
         }
 
-        function updateTotals(rkey, sno) {
-            let rowTotal = 0;
-            CRITERIA[rkey].forEach(c => {
+        // ─── Switch active round panel (Now triggers immediate save) ───
+        function switchRound(rkey) {
+            saveScores(true);
+            document.querySelectorAll('.round-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.round-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + rkey).classList.add('active');
+            document.getElementById('panel-' + rkey).classList.add('active');
+            const url = new URL(window.location);
+            url.searchParams.set('tab', rkey);
+            window.history.replaceState({}, '', url);
+        }
+
+        function updateRowTotal(rkey, sno) {
+            const criteria = CRITERIA[rkey];
+            let total = 0;
+            criteria.forEach(c => {
                 const inp = document.getElementById(`inp-${c.field}-${sno}`);
-                let v = Math.min(parseFloat(inp.value) || 0, c.max);
-                if (parseFloat(inp.value) > c.max) inp.value = c.max;
-                rowTotal += v;
+                if (!inp) return;
+                let val = parseFloat(inp.value) || 0;
+                if (val > c.max) {
+                    alert(`⚠️ Invalid Score: Max for ${c.field.replace('r','Round ').replace('_',' ')} is ${c.max}.`);
+                    inp.value = c.max;
+                    val = c.max;
+                    inp.classList.add('over-limit');
+                } else {
+                    inp.classList.remove('over-limit');
+                }
+                total += Math.min(val, c.max);
             });
-            document.getElementById(`total-${rkey}-${sno}`).textContent = Math.round(rowTotal);
-            
-            let cumTotal = 0;
-            document.querySelectorAll(`.criteria-input[data-team="${sno}"]`).forEach(inp => {
-                cumTotal += Math.min(parseFloat(inp.value) || 0, parseFloat(inp.dataset.max));
+            const display = document.getElementById(`total-${rkey}-${sno}`);
+            if (display) {
+                display.textContent = Math.round(total);
+            }
+            updateCumulative(sno);
+        }
+
+        function updateCumulative(sno) {
+            let overallTotal = 0;
+            document.querySelectorAll(`input[id$="-${sno}"]`).forEach(inp => {
+                let max = parseFloat(inp.getAttribute('data-max')) || 0;
+                let val = parseFloat(inp.value) || 0;
+                overallTotal += Math.min(val, max);
             });
-            document.querySelectorAll(`.cum-${sno}`).forEach(el => el.textContent = Math.round(cumTotal));
+            document.querySelectorAll(`.cum-${sno}`).forEach(el => {
+                el.textContent = Math.round(overallTotal);
+            });
+        }
+
+        function changeTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.criteria-input').forEach(inp => {
-                inp.setAttribute('autocomplete', 'off');
+             document.querySelectorAll('.criteria-input').forEach(inp => {
+                inp.addEventListener('blur', () => saveScores(true));
                 inp.addEventListener('input', () => {
-                    updateTotals(inp.dataset.round, inp.dataset.team);
-                    debouncedSync();
-                });
-                inp.addEventListener('blur', () => sync(true));
-            });
-
-            document.querySelectorAll('form[action^="/"]').forEach(f => {
-                if (f.id !== 'scoringForm') f.addEventListener('submit', () => {
-                    lock = true;
-                    document.getElementById('loadingOverlay').classList.add('show');
+                    const rkey = inp.getAttribute('data-round');
+                    const sno = inp.getAttribute('data-team');
+                    updateRowTotal(rkey, sno);
+                    debouncedSave();
                 });
             });
 
-            const p = new URLSearchParams(window.location.search);
-            if (p.get('tab')) switchRound(p.get('tab'));
-            if (p.get('registered') === '1') showPopup('🎉', 'Teams Initialized', 'Dashboard is now ready.');
-            if (p.get('reset') === '1') showPopup('🗑️', 'System Wiped', 'Database is empty.', true);
+            window.addEventListener('beforeunload', () => saveScores(true));
+            
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('tab')) switchRound(params.get('tab'));
+            else if (params.get('tab') === 'setup') switchRound('setup');
+
+            if (params.get('emailed') === '1') showPopup('📧', 'Emails Sent!', 'Assignments delivered.');
+            if (params.get('registered') === '1') showPopup('🎉', 'Teams Initialized!', 'Dashboard ready.');
+            if (params.get('reset') === '1') showPopup('🗑️', 'Dashboard Reset!', 'Wiped successfully.', true);
+
+            const step1 = document.querySelector('form[action="/upload_dispatch"]');
+            if (step1) step1.addEventListener('submit', () => {
+                document.getElementById('loadingText').textContent = 'Broadcasting Assignments...';
+                document.getElementById('loadingOverlay').classList.add('show');
+            });
+            const step2 = document.querySelector('form[action="/finalize_registry"]');
+            if (step2) step2.addEventListener('submit', () => {
+                document.getElementById('loadingText').textContent = 'Initializing Teams...';
+                document.getElementById('loadingOverlay').classList.add('show');
+            });
+
+            Object.keys(CRITERIA).forEach(rkey => {
+                document.querySelectorAll(`[data-round="${rkey}"]`).forEach(inp => {
+                    const sno = inp.dataset.team;
+                    if (sno) updateRowTotal(rkey, sno);
+                });
+            });
         });
 
-        function showPopup(icon, title, sub) {
+        function showPopup(icon, title, sub, isWarning = false) {
             document.getElementById('popupIcon').textContent = icon;
             document.getElementById('popupTitle').textContent = title;
             document.getElementById('popupSub').textContent = sub;
+            const card = document.querySelector('.popup-card');
+            card.style.borderColor = isWarning ? '#ff9800' : 'var(--primary-neon)';
+            card.style.boxShadow = isWarning ? '0 0 60px rgba(255,152,0,0.2)':'0 0 60px color-mix(in srgb,var(--primary-neon) 25%,transparent)';
             document.getElementById('successPopup').classList.add('show');
+            if (!isWarning) setTimeout(() => document.getElementById('successPopup').classList.remove('show'), 5000);
         }
-        function closePopup() { document.getElementById('successPopup').classList.remove('show'); }
+
+        function closePopup() {
+            document.getElementById('successPopup').classList.remove('show');
+        }
+
+        // ─── Show toast on redirect-back (via URL param) ───
+        const urlParams = new URLSearchParams(window.location.search);
+        const toastEl = document.getElementById('saveToast');
+        if (urlParams.get('saved') === '1') {
+            toastEl.textContent = '✅ Scores mathematically locked successfully!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
+        } else if (urlParams.get('registered') === '1') {
+            toastEl.textContent = '✅ Database successfully populated with Registry!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
+        } else if (urlParams.get('emailed') === '1') {
+            toastEl.textContent = '📧 Startup Project ID emails securely dispatched!';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3500);
+        }
     </script>
 </body>
 </html>

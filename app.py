@@ -71,17 +71,11 @@ SCORING_META = {
     'R4': {'title': 'Round 4 – Final Pitch', 'desc': 'Live Demo & Q&A', 'weight': '30%', 'criteria': [{'field': 'r4_innovation', 'label': 'Innovation', 'max': 10}, {'field': 'r4_workingprototype', 'label': 'Working Prototype', 'max': 15}, {'field': 'r4_realtimeimpact', 'label': 'Real-Time Impact', 'max': 10}, {'field': 'r4_presentationskills', 'label': 'Presentation Skills', 'max': 5}, {'field': 'r4_qahandling', 'label': 'Q&A Handling', 'max': 10}]}
 }
 
-def initialize_db(path=None, wipe=False):
+def initialize_db(path=None):
     c = get_db_connection()
     if not c: return
     try:
         cur = c.cursor()
-        
-        # ⚠️ IF WIPE REQUESTED: Atomic Clear
-        if wipe:
-            cur.execute("DROP TABLE IF EXISTS teams;")
-            c.commit()
-
         schema = """CREATE TABLE IF NOT EXISTS teams (teamid TEXT PRIMARY KEY, projectid TEXT, teamname TEXT, projecttitle TEXT, email TEXT,
         r1_innovation NUMERIC DEFAULT 0, r1_problemrelevance NUMERIC DEFAULT 0, r1_techfeasibility NUMERIC DEFAULT 0, r1_claritypresentation NUMERIC DEFAULT 0,
         r2_feasibilityvalidation NUMERIC DEFAULT 0, r2_systemdesignlogic NUMERIC DEFAULT 0, r2_demoquality NUMERIC DEFAULT 0, r2_technicalunderstanding NUMERIC DEFAULT 0,
@@ -91,12 +85,12 @@ def initialize_db(path=None, wipe=False):
         cur.execute(schema)
         
         if path:
+            print(f"📂 Initializing from: {path}")
             cur.execute("DELETE FROM teams;")
-            c.commit()
+            c.commit() # 🔥 Immediate commit of the wipe
             
             df = pd.read_csv(path, sep=None, engine='python', encoding_errors='ignore') if str(path).lower().endswith('.csv') else pd.read_excel(path)
             df.columns = [str(col).strip() for col in df.columns]
-            # ... (Rest of registry import logic remains the same)
             
             for r in df.to_dict(orient='records'):
                 try:
@@ -174,24 +168,15 @@ def send_email(to, sub, body):
         msg = EmailMessage()
         msg.set_content(body)
         msg['Subject'] = sub
-        msg['From'] = f"PRAKALP 2026 Admin <{SENDER_EMAIL}>"
+        msg['From'] = f"PRAKALP 2026<{SENDER_EMAIL}>"
         msg['To'] = to.strip()
-        # 🚀 Port 587 with STARTTLS is generally more compatible with cloud hosts
-        with smtplib.SMTP('smtp.gmail.com', 587, timeout=15) as s:
-            s.starttls()
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
             s.login(SENDER_EMAIL, SENDER_PASSWORD)
             s.send_message(msg)
-        return True, "Sent"
-    except Exception as e:
-        err = str(e)
-        if "Authentication failed" in err: return False, "Authentication Failure: Check App Password"
-        if "quota" in err.lower(): return False, "Gmail Daily Quota Exceeded"
-        return False, err
+    except: pass
 
 @app.route('/')
-def index():
-    if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    return render_template('index.html', teams=get_teams())
+def index(): return render_template('index.html', teams=get_teams())
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -235,26 +220,21 @@ def upload_dispatch():
     if not file: return redirect(url_for('admin'))
     file.save(REGISTRY_PATH)
     
+    # 📧 Background Broadcast Simulation
     try:
         df = pd.read_csv(REGISTRY_PATH, sep=None, engine='python', encoding_errors='ignore') if REGISTRY_PATH.endswith('.csv') else pd.read_excel(REGISTRY_PATH)
         rows = df.to_dict(orient='records')
         sent = 0
-        failed_list = []
         sent_emails = set()
-        
         for r in rows:
             def f(ks):
                 for k in ks:
                     for rk in r.keys():
                         if k.lower() in str(rk).lower(): return str(r[rk]).strip()
                 return ""
-            
-            e = f(['Email', 'Mail', 'Student Email', 'ID']).lower()
+            e = f(['Email', 'Mail']).lower()
             if "@" in e and e not in sent_emails:
-                pid = f(['Batch', 'Project', 'ID', 'PID'])
-                n = f(['Name', 'Student', 'Team'])
-                title = f(['Title', 'Problem', 'Statement'])
-                
+                n, pid, title = f(['Name', 'Student', 'Team']), f(['Batch', 'Project', 'PID']), f(['Title', 'Problem', 'Statement'])
                 body = f"""Dear Student, 
 
 Greetings from PRAKALP Hackathon Team!
@@ -264,22 +244,18 @@ We are pleased to inform you that your problem statement has been officially ass
 Hackathon Project ID: {pid}
 Problem Statement: {title}
 
-You are requested to carefully go through the problem statement and start working on your project.
+You are requested to carefully go through the problem statement and start working on your project. Make sure to plan your approach, develop innovative solutions, and stay consistent with the given guidelines and timelines.
 
-Wishing you all the best!
+If you have any queries, please contact the organizing team.
+
+Wishing you all the best for your Hackathon Journey!
 
 Regards,
 PRAKALP Admin Team"""
-                success, reason = send_email(e, f"PRAKALP Assignment: {pid}", body)
-                if success:
-                    sent += 1
-                    sent_emails.add(e)
-                else:
-                    failed_list.append({'name': n or 'Unknown', 'email': e, 'reason': reason})
-        
-        # Store failure details for dashboard banner
-        session['failed_emails'] = failed_list
-        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&step1_done=1&tab=setup')
+                send_email(e, f"PRAKALP Assignment: {pid}", body)
+                sent_emails.add(e)
+                sent += 1
+        return redirect(url_for('admin') + f'?emailed=1&sent={sent}&step1_done=1&tab=setup')
     except Exception as e:
         print(f"❌ Dispatch error: {e}")
         return redirect(url_for('admin') + f'?error=dispatch_failed&tab=setup')
@@ -288,7 +264,7 @@ PRAKALP Admin Team"""
 def finalize_registry():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
     if os.path.exists(REGISTRY_PATH):
-        initialize_db(REGISTRY_PATH, wipe=True)
+        initialize_db(REGISTRY_PATH)
     import time
     return redirect(url_for('admin') + f'?registered=1&tab=setup&t={int(time.time())}')
 
@@ -351,17 +327,16 @@ def download_results():
             final_mapping = {
                 'Rank': 'Rank',
                 'Prize Category': 'Award',
-                'TeamID': 'Team ID',
-                'ProjectID': 'Project ID',
-                'TeamName': 'Team Name',
-                'ProjectTitle': 'Project Title',
-                'R1_Total': 'R1 (15%)',
-                'R2_Total': 'R2 (15%)',
-                'R3P1_Total': 'R3P1 (20%)',
-                'R3P2_Total': 'R3P2 (20%)',
-                'R4_Total': 'R4 (30%)',
-                'Raw_Total': 'Grand Total Marks',
-                'Weighted_Total': 'Weighted Total (%)'
+                'teamid': 'Team ID',
+                'projectid': 'Project ID',
+                'teamname': 'Team Name',
+                'projecttitle': 'Project Title',
+                'r1_total': 'R1 (15%)',
+                'r2_total': 'R2 (15%)',
+                'r3p1_total': 'R3P1 (20%)',
+                'r3p2_total': 'R3P2 (20%)',
+                'r4_total': 'R4 (30%)',
+                'weighted_total': 'Weighted Total (%)'
             }
             
             fexport = fdf.reindex(columns=list(final_mapping.keys()), fill_value=0)
@@ -398,7 +373,7 @@ def download_results():
                     cell.border = thin_border
                     cell.alignment = Alignment(vertical="center", horizontal="left" if cell.column in [3, 5, 6] else "center")
 
-            widths = {'A':6, 'B':15, 'C':15, 'D':15, 'E':25, 'F':35, 'G':12, 'H':12, 'I':12, 'J':12, 'K':12, 'L':18}
+            widths = {'A':6, 'B':15, 'C':15, 'D':15, 'E':25, 'F':35}
             for col, width in widths.items():
                 ws.column_dimensions[col].width = width
 
@@ -408,10 +383,13 @@ def download_results():
     output.seek(0)
     return send_file(output, as_attachment=True, download_name='PRAKALP_2026_IoT_Hackathon_Final_Results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
+    output.seek(0)
+    return send_file(output, as_attachment=True, download_name='PRAKALP_2026_IoT_Hackathon_Final_Results.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
 @app.route('/reset_db', methods=['POST'])
 def reset_db():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
-    initialize_db(wipe=True)
+    initialize_db()
     return redirect(url_for('admin') + '?reset=1&tab=setup')
 
 if __name__ == '__main__':
