@@ -458,7 +458,7 @@
 
                         {% for round_key, (round_title, db_key) in rounds.items() %}
                         <td style="text-align:center;">
-                            <select name="{{ round_key }}_{{ sno }}" onchange="recalcRow('{{ sno }}')" class="criteria-input" style="width: auto; padding: 8px 12px; background: #111418; border-color: var(--glass-border); font-size: 1rem;">
+                            <select name="{{ round_key }}_{{ sno }}" onchange="recalcRow('{{ sno }}')" {% if team[db_key] %}disabled{% endif %} class="criteria-input" style="width: auto; padding: 8px 12px; font-size: 1rem; {% if team[db_key] %}background: transparent; border-color: transparent; appearance: none; -webkit-appearance: none; color: var(--primary-neon); font-weight: 800; opacity: 1; cursor: default;{% else %}background: #111418; border-color: var(--glass-border);{% endif %}">
                                 <option value="">-</option>
                                 {% for g in grades %}
                                 <option value="{{ g }}" {% if team[db_key] == g %}selected{% endif %}>{{ g }}</option>
