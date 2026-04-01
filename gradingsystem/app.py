@@ -65,7 +65,6 @@ GRADE_POINTS = {
     'B+': 80,
     'B': 70,
     'C': 60,
-    'D': 50,
     '': 0
 }
 
@@ -217,7 +216,7 @@ def admin():
         'round3p2': ('Round 3 P2', 'R3P2_Grade'),
         'round4': ('Round 4', 'R4_Grade')
     }
-    return render_template('admin.html', teams=get_teams(), rounds=round_info, grades=['A+', 'A', 'B+', 'B', 'C', 'D'])
+    return render_template('admin.html', teams=get_teams(), rounds=round_info, grades=['A+', 'A', 'B+', 'B', 'C'])
 
 @app.route('/update_scores', methods=['POST'])
 def update_scores():
