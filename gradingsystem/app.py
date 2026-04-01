@@ -206,6 +206,11 @@ def login():
             return redirect(url_for('admin'))
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('index'))
+
 @app.route('/admin')
 def admin():
     if not session.get('admin_logged_in'): return redirect(url_for('login'))
