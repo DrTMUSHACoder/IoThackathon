@@ -230,6 +230,8 @@ def upload_dispatch():
     
     try:
         df = pd.read_csv(REGISTRY_PATH, sep=None, engine='python', encoding_errors='ignore') if REGISTRY_PATH.endswith('.csv') else pd.read_excel(REGISTRY_PATH)
+        # 🚀 CLEAN HEADERS: Ensure no whitespace issues
+        df.columns = [str(c).strip() for c in df.columns]
         rows = df.to_dict(orient='records')
         sent, failed_list = 0, []
         sent_emails = set()
@@ -239,30 +241,32 @@ def upload_dispatch():
 
         # 🚀 REUSE CONNECTION: Open once, send all
         try:
-            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=15) as server:
                 server.login(SENDER_EMAIL, SENDER_PASSWORD)
                 
-                for r in rows:
+                for i, r in enumerate(rows):
                     def f(ks):
                         for k in ks:
                             for rk in r.keys():
-                                if k.lower() in str(rk).lower(): return str(r[rk]).strip()
+                                if k.lower() in str(rk).lower().strip(): 
+                                    val = str(r[rk]).strip()
+                                    if val and val.lower() != 'nan': return val
                         return ""
                     
                     raw_email = f(['Email', 'Mail', 'Address'])
-                    e = raw_email.lower()
+                    e = raw_email.lower().replace(" ", "") # Remove any accidental spaces in email
                     n = f(['Name', 'Student', 'Team', 'Member'])
                     pid = f(['Batch', 'Project', 'PID', 'ID', 'Serial', 'Code'])
                     title = f(['Title', 'Problem', 'Statement', 'Topic', 'Description'])
                     
-                    if not e:
-                         failed_list.append({'name': n or "Row Data", 'email': "NOT FOUND", 'reason': f"Could not find 'Email' column."})
+                    if not e or "@" not in e:
+                         failed_list.append({'name': n or f"Row {i+1}", 'email': e or "MISSING", 'reason': f"Invalid or missing email in column. Header detected: {list(r.keys())}"})
                          continue
                          
                     if e in sent_emails: continue
 
                     if not pid or not title:
-                         failed_list.append({'name': n, 'email': e, 'reason': f"Missing ID or Title."})
+                         failed_list.append({'name': n, 'email': e, 'reason': f"Missing Project ID or Title data. Found ID: '{pid}', Title: '{title}'"})
                          continue
 
                     if EMAIL_REGEX.match(e):
@@ -282,14 +286,16 @@ PRAKALP Admin Team"""
                         if ok:
                             sent_emails.add(e)
                             sent += 1
-                            time.sleep(0.5) # ⏱️ Avoid triggering spam filters
+                            time.sleep(0.4) # ⏱️ Avoid triggering spam filters
                         else:
                             failed_list.append({'name': n, 'email': e, 'reason': f"SMTP Error: {err}"})
                     else:
-                        failed_list.append({'name': n, 'email': e, 'reason': f"Malformed email format: '{raw_email}'"})
+                        failed_list.append({'name': n, 'email': e, 'reason': f"Malformed email format (regex fail): '{e}'"})
+        except smtplib.SMTPAuthenticationError:
+            return redirect(url_for('admin') + f'?error=dispatch_failed&reason=Gmail Authentication Failed. Please check if App Password is correct and SMTP is enabled.&tab=setup')
         except Exception as smtp_err:
             print(f"❌ Critical SMTP failure: {smtp_err}")
-            return redirect(url_for('admin') + f'?error=dispatch_failed&reason=SMTP Auth/Server failure: {str(smtp_err)}&tab=setup')
+            return redirect(url_for('admin') + f'?error=dispatch_failed&reason=SMTP Connection Error: {str(smtp_err)}&tab=setup')
         
         session['failed_emails'] = failed_list
         return redirect(url_for('admin') + f'?emailed=1&sent={sent}&failed={len(failed_list)}&tab=setup')
