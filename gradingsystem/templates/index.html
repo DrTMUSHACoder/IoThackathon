@@ -55,7 +55,7 @@
                     <div style="margin-top: 15px; font-weight: 800; font-size: 1.25rem; color: var(--text-primary); margin-bottom: 5px;">{{ team.TeamName }}</div>
                     <div style="font-size: 1.5rem; font-weight: 900; color: var(--primary-neon);">{{ "%.2f"|format(team.Weighted_Total|float) }}%</div>
                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 10px; border-top: 1px solid var(--glass-border); padding-top: 10px;">
-                        {{ team.TeamID }} | {{ team.ProjectTitle[:30] }}{% if team.ProjectTitle|length > 30 %}...{% endif %}
+                        {{ team.TeamID }} | {{ (team.ProjectTitle or '')[:30] }}{% if (team.ProjectTitle or '')|length > 30 %}...{% endif %}
                     </div>
                 </div>
                 {% endfor %}

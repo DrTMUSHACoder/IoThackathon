@@ -142,8 +142,12 @@ def get_teams():
             res = [dict(r) for r in cur.fetchall()]
         
         for t in res:
-            # Consistent mapping
-            t['TeamID'], t['ProjectID'], t['TeamName'], t['ProjectTitle'], t['Email'] = t.get('teamid'), t.get('projectid'), t.get('teamname'), t.get('projecttitle'), t.get('email')
+            # Consistent mapping with safe fallbacks
+            t['TeamID'] = t.get('teamid') or str(t.get('TeamID') or '')
+            t['ProjectID'] = t.get('projectid') or str(t.get('ProjectID') or 'PR-IOT')
+            t['TeamName'] = t.get('teamname') or str(t.get('TeamName') or 'Anonymous Team')
+            t['ProjectTitle'] = t.get('projecttitle') or str(t.get('ProjectTitle') or 'Untitled Project')
+            t['Email'] = t.get('email') or str(t.get('Email') or '')
             
             # Map letters
             r1 = t.get('round1') or ''
